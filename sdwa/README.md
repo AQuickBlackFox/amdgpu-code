@@ -16,6 +16,7 @@
 | v_max_u32 |
 | v_max_i32 |
 | v_max_f32 |
+| v_mul_lo_u16 |
 | v_mul_lo_u32 |
 | v_mul_hi_u32|
 | v_mul_hi_i32 |
