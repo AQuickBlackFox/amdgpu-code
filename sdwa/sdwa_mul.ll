@@ -5,7 +5,7 @@ define i32 @sdwa(i32 %in1, i32 %in2) {
   ret i32 %val
 }
 
-define spir_func void @sdwa_mul(i32 addrspace(1)* %in1, i32 addrspace(1)* %in2, i32 addrspace(1)* %out) {
+define spir_kernel void @sdwa_mul(i32 addrspace(1)* %in1, i32 addrspace(1)* %in2, i32 addrspace(1)* %out) {
   %id = call i32 @llvm.amdgcn.workitem.id.x()
   %in1_ptr = getelementptr i32, i32 addrspace(1)* %in1, i32 %id
   %in2_ptr = getelementptr i32, i32 addrspace(1)* %in2, i32 %id
