@@ -21,27 +21,23 @@ THE SOFTWARE.
 #include<hip/hip_runtime_api.h>
 #include<iostream>
 
-#define LEN 1024*1024*128
+#define LEN 64
 #define SIZE LEN<<2
 
-#define fileName "sdwa_dp4.co"
-#define kernelName "sdwa_dp4"
-
-#define VAL 0x01010101
+#define fileName "sdwa_mul.co"
+#define kernelName "sdwa_mul"
 
 int main() {
-  unsigned *Ah, *Bh, *Ch, *Dh;
-  hipDeviceptr_t Ad, Bd, Cd, Dd;
+  unsigned *Ah, *Bh, *Ch;
+  hipDeviceptr_t Ad, Bd, Cd;
   Ah = new unsigned[LEN];
   Bh = new unsigned[LEN];
   Ch = new unsigned[LEN];
-	Dh = new unsigned[LEN];
 
   for(unsigned i=0;i<LEN;i++) {
-    Ah[i] = VAL;
-    Bh[i] = VAL;
+    Ah[i] = 2;
+    Bh[i] = 3;
     Ch[i] = 0;
-		Dh[i] = 0;
   }
 
   hipInit(0);
@@ -55,11 +51,9 @@ int main() {
   hipMalloc((void**)&Ad, SIZE);
   hipMalloc((void**)&Bd, SIZE);
   hipMalloc((void**)&Cd, SIZE);
-  hipMalloc((void**)&Dd, SIZE);
 
   hipMemcpyHtoD(Ad, Ah, SIZE);
   hipMemcpyHtoD(Bd, Bh, SIZE);
-  hipMemcpyHtoD(Cd, Ch, SIZE);
 
   hipModuleLoad(&Module, fileName);
   hipModuleGetFunction(&Function, Module, kernelName);
@@ -68,13 +62,11 @@ int main() {
     void *Ad;
     void *Bd;
     void *Cd;
-		void *Dd;
   } args;
 
   args.Ad = Ad;
   args.Bd = Bd;
   args.Cd = Cd;
-	args.Dd = Dd;
 
   size_t size = sizeof(args);
 
@@ -84,13 +76,9 @@ int main() {
     HIP_LAUNCH_PARAM_END
   };
 
-  clock_t start = clock();
-  hipModuleLaunchKernel(Function, LEN/1024,1,1, 1024,1,1, 0, 0, NULL, (void**)&config);
-  hipDeviceSynchronize();
-  clock_t stop = clock();
-  double us = (double)(stop - start)/CLOCKS_PER_SEC;
-  std::cout<<us<<std::endl;
-  hipMemcpyDtoH(Dh, Dd, SIZE);
+  hipModuleLaunchKernel(Function, 1,1,1, LEN,1,1, 0, 0, NULL, (void**)&config);
 
-  std::cout<<Dh[10]<<" "<<Dh[11]<<std::endl;
+  hipMemcpyDtoH(Ch, Cd, SIZE);
+
+  std::cout<<Ch[10]<<std::endl;
 }
