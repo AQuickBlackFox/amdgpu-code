@@ -84,12 +84,19 @@ int main() {
     HIP_LAUNCH_PARAM_END
   };
 
-  clock_t start = clock();
-  hipModuleLaunchKernel(Function, LEN/1024,1,1, 1024,1,1, 0, 0, NULL, (void**)&config);
-  hipDeviceSynchronize();
-  clock_t stop = clock();
-  double us = (double)(stop - start)/CLOCKS_PER_SEC;
-  std::cout<<us<<std::endl;
+//  clock_t start = clock();
+  struct timespec start;
+  struct timespec stop;
+  clock_gettime(CLOCK_MONOTONIC, &start);
+  for(unsigned i=0;i<1024;i++){
+    hipModuleLaunchKernel(Function, LEN/1024,1,1, 1024,1,1, 0, 0, NULL, (void**)&config);
+    hipDeviceSynchronize();
+  }
+  clock_gettime(CLOCK_MONOTONIC, &stop);
+  std::cout<<stop.tv_sec - start.tv_sec<<" "<<stop.tv_nsec - start.tv_nsec<<std::endl;
+//  clock_t stop = clock();
+//  double us = (double)(stop - start)/CLOCKS_PER_SEC;
+//  std::cout<<us<<std::endl;
   hipMemcpyDtoH(Dh, Dd, SIZE);
 
   std::cout<<Dh[10]<<" "<<Dh[11]<<std::endl;
