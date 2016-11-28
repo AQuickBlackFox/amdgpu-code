@@ -36,5 +36,10 @@ sdwa_half.device:
 	$(CLANG) -x assembler -target $(TARGET) -mcpu=$(CPU) -c -o sdwa_half.o sdwa_half.s
 	$(CLANG) -target $(TARGET) sdwa_half.o -o sdwa_half.co
 
+sdwa_sdp4.device:
+	$(LLC) -mtriple $(TARGET) -march=amdgcn -mcpu=$(CPU) sdwa_sdp4.ll
+	$(CLANG) -x assembler -target $(TARGET) -mcpu=$(CPU) -c -o sdwa_sdp4.o sdwa_sdp4.s
+	$(CLANG) -target $(TARGET) sdwa_sdp4.o -o sdwa_sdp4.co
+
 clean:
-	rm -r -f *.o *.co *.s sdwa_mul sdwa_comp sdwa_dp4 
+	rm -r -f *.o *.co *.s sdwa_mul sdwa_comp sdwa_dp4
