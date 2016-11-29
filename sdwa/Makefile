@@ -41,5 +41,10 @@ sdwa_sdp4.device:
 	$(CLANG) -x assembler -target $(TARGET) -mcpu=$(CPU) -c -o sdwa_sdp4.o sdwa_sdp4.s
 	$(CLANG) -target $(TARGET) sdwa_sdp4.o -o sdwa_sdp4.co
 
+sdwa_sdp4.host:
+	$(HIPCC) sdwa_sdp4.cpp -o sdwa_sdp4
+
+
+
 clean:
-	rm -r -f *.o *.co *.s sdwa_mul sdwa_comp sdwa_dp4
+	rm -r -f *.o *.co *.s sdwa_mul sdwa_comp sdwa_dp4 sdwa_sdp4
