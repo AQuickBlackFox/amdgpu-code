@@ -26,5 +26,11 @@ mul_sign:
 	$(CLANG) -target $(TARGET) mul.o -o mul.co
 	$(HIPCC) mul.cpp -o mul
 
+mul:
+	$(LLC) -mtriple $(TARGET) -march=$(ARCH) -mcpu=$(CPU) muli32.ll -o muli32.s
+	$(CLANG) -x assembler -target $(TARGET) -mcpu=$(CPU) -c -o muli32.o muli32.s
+	$(CLANG) -target $(TARGET) muli32.o -o muli32.co
+	$(HIPCC) muli32.cpp -o muli32
+
 clean:
 	rm *.s *.co *.o mul
