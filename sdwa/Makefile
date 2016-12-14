@@ -52,7 +52,15 @@ sdwa_sdp4.device:
 sdwa_sdp4.host:
 	$(HIPCC) sdwa_sdp4.cpp -o sdwa_sdp4
 
+sdwa_half2.device:
+	$(LLC) -mtriple $(TARGET) -march=amdgcn -mcpu=$(CPU) sdwa_half2.ll
+	$(CLANG) -x assembler -target $(TARGET) -mcpu=$(CPU) -c -o sdwa_half2.o sdwa_half2.s
+	$(CLANG) -target $(TARGET) sdwa_half2.o -o sdwa_half2.co
+
+sdwa_half2.host:
+	$(HIPCC) sdwa_half2.cpp -o sdwa_half2
+
 
 
 clean:
-	rm -r -f *.o *.co *.s sdwa_mul sdwa_comp sdwa_dp4 sdwa_sdp4 sdwa_mulpk
+	rm -r -f *.o *.co *.s sdwa_mul sdwa_comp sdwa_dp4 sdwa_sdp4 sdwa_mulpk sdwa_half sdwa_half2
