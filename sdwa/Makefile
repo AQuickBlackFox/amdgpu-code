@@ -60,6 +60,20 @@ sdwa_half2.device:
 sdwa_half2.host:
 	$(HIPCC) sdwa_half2.cpp -o sdwa_half2
 
+sdwa_short.device:
+	$(LLC) -mtriple $(TARGET) -march=amdgcn -mcpu=$(CPU) sdwa_short.ll
+	$(CLANG) -x assembler -target $(TARGET) -mcpu=$(CPU) -c -o sdwa_short.o sdwa_short.s
+	$(CLANG) -target $(TARGET) sdwa_short.o -o sdwa_short.co
+
+sdwa_short.host:
+	$(HIPCC) sdwa_short.cpp -o sdwa_short
+
+sdwa_bitcast.device:
+	$(LLC) -mtriple $(TARGET) -march=amdgcn -mcpu=$(CPU) sdwa_bitcast.ll
+	$(CLANG) -x assembler -target $(TARGET) -mcpu=$(CPU) -c -o sdwa_bitcast.o sdwa_bitcast.s
+	$(CLANG) -target $(TARGET) sdwa_bitcast.o -o sdwa_bitcast.co
+
+
 
 
 clean:
