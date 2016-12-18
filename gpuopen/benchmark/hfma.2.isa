@@ -215,131 +215,131 @@ DoHFma:                                 ; @DoHFma
 	v_and_b32_e32 v1, s1, v1
 	s_waitcnt vmcnt(0)
 BB1_1:                                  ; =>This Inner Loop Header: Depth=1
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	;;#ASMSTART
 	v_mad_f16 v2, v1, v2, v1
 	;;#ASMEND
-	v_and_b32_e32 v2, s1, v2
+	
 	s_addk_i32 s0, 0xffe0
 	s_cmp_eq_u32 s0, 0
 	;;#ASMSTART
