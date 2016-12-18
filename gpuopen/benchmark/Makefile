@@ -15,5 +15,12 @@ hadd2.1.device:
 hadd2.1.host:
 	$(HIPCC) hadd2.1.cpp -o hadd2.1
 
+hmul2.1.device:
+	$(LLC) -mtriple $(TARGET) -march=amdgcn -mcpu=$(CPU) hmul2.1.ll
+	$(CLANG) -x assembler -target $(TARGET) -mcpu=$(CPU) -c -o hmul2.1.o hmul2.1.s
+	$(CLANG) -target $(TARGET) hmul2.1.o -o hmul2.1.co
+
+
+
 clean:
 	rm -r -f *.co *.o *.s hadd2.1
