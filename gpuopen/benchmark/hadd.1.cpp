@@ -21,8 +21,8 @@ unsigned long long dtime_usec(unsigned long long start){
 
 __global__ void DoHAdd(hipLaunchParm lp, __half *a, __half *b) {
   int tx = hipThreadIdx_x;
-  __half a0 = a[tx];
-  __half b0 = b[tx];
+  float a0 = (float)a[tx];
+  float b0 = (float)b[tx];
   for(unsigned i=0;i<ITER;i++) {
     b0 += a0;
   }
