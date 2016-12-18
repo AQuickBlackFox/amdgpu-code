@@ -5,7 +5,7 @@ CLANG=$(LLVM_PATH)/bin/clang
 TARGET=amdgcn--amdhsa
 CPU=fiji
 
-all: hadd2.1.device hadd2.1.host
+all: hadd2.1.device hadd2.1.host hmul2.1.device hmul2.1.host
 
 hadd2.1.device:
 	$(LLC) -mtriple $(TARGET) -march=amdgcn -mcpu=$(CPU) hadd2.1.ll
@@ -20,7 +20,16 @@ hmul2.1.device:
 	$(CLANG) -x assembler -target $(TARGET) -mcpu=$(CPU) -c -o hmul2.1.o hmul2.1.s
 	$(CLANG) -target $(TARGET) hmul2.1.o -o hmul2.1.co
 
+hmul2.1.host:
+	$(HIPCC) hmul2.1.cpp -o hmul2.1
 
+ffma.1.device:
+	$(LLC) -mtriple $(TARGET) -march=amdgcn -mcpu=$(CPU) ffma.1.ll
+	$(CLANG) -x assembler -target $(TARGET) -mcpu=$(CPU) -c -o ffma.1.o ffma.1.s
+	$(CLANG) -target $(TARGET) ffma.1.o -o ffma.1.co
+
+ffma.1.host:
+	$(HIPCC) ffma.1.cpp -o ffma.1
 
 clean:
-	rm -r -f *.co *.o *.s hadd2.1
+	rm -r -f *.co *.o *.s hadd2.1 hmul2.1 ffma.1

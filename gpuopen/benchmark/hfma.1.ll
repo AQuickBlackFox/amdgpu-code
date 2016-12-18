@@ -12,17 +12,19 @@ define spir_func i32 @__rocm_hmul_w1_w1_w1_preserve(i32 %c, i32 %a, i32 %b) #1 {
     ret i32 %c
 }
 
-define spir_kernel void @DoHMul2PK(i32* nocapture readonly %a, i32* nocapture readonly %b, i32* nocapture %c) local_unnamed_addr #5 {
+define spir_kernel void @DoHFma(half* nocapture readonly %a, half* nocapture readonly %b, half* nocapture readonly %c, half* nocapture %d) local_unnamed_addr #5 {
   %1 = tail call i32 @llvm.amdgcn.workitem.id.x() #12
-  %arrayidx = getelementptr inbounds i32, i32* %a, i32 %1
-  %2 = load i32, i32* %arrayidx, align 4, !tbaa !7
-  %arrayidx2 = getelementptr inbounds i32, i32* %b, i32 %1
-  %3 = load i32, i32* %arrayidx2, align 4, !tbaa !7
+  %arrayidx = getelementptr inbounds half, half* %a, i32 %1
+  %2 = load half, half* %arrayidx, align 4, !tbaa !7
+  %arrayidx2 = getelementptr inbounds half, half* %b, i32 %1
+  %3 = load half, half* %arrayidx2, align 4, !tbaa !7
+  %arrayidx3 = getelementptr inbounds half, half* %c, i32 %1
+
   br label %5
 
 ; <label>:4:                                      ; preds = %5
-  %arrayidx6 = getelementptr inbounds i32, i32* %c, i32 %1
-  store i32 %call4.15, i32* %arrayidx6, align 4, !tbaa !7
+  %arrayidx6 = getelementptr inbounds half, half* %c, i32 %1
+  store half %call4.15, i32* %arrayidx6, align 4, !tbaa !7
   ret void
 
 ; <label>:5:                                      ; preds = %5, %0

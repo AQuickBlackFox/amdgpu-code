@@ -2,12 +2,22 @@
 
 declare i32 @llvm.amdgcn.workitem.id.x()
 
-define spir_func i32 @__rocm_hmul_nosdwa(i32 %a, i32 %b) #1 {
-    %out = tail call i32 asm sideeffect "v_mul_f16 $0, $1, $2","=v,v,v"(i32 %a, i32 %b)
+define spir_func i32 @__rocm_hfma_nosdwa(i32 %a, i32 %b, i32 %c) #1 {
+    %out = tail call i32 asm sideeffect "v_fma_f16 $0, $1, $2, $3","=v,v,v,v"(i32 %a, i32 %b, i32 %c)
     ret i32 %out
 }
 
-define spir_func i32 @__rocm_hmul_w1_w1_w1_preserve(i32 %c, i32 %a, i32 %b) #1 {
+define spir_func i32 @__rocm_hmul_w1_w1_w1_preserve(i32 %out, i32 %a, i32 %b) #1 {
+    tail call void asm sideeffect "v_mul_f16_sdwa $0, $1, $2 dst_sel:WORD_1 dst_unused:UNUSED_PRESERVE src0_sel:WORD_1 src1_sel:WORD_1","v,v,v"(i32 %out, i32 %a, i32 %b)
+    ret i32 %out
+}
+
+define spir_func i32 @__rocm_hadd_w1_w1_w1_preserve(i32 %out, i32 %a, i32 %b) #1 {
+    tail call void asm sideeffect "v_add_f16_sdwa $0, $1, $2 dst_sel:WORD_1 dst_unused:UNUSED_PRESERVE src0_sel:WORD_1 src1_sel:WORD_1","v,v,v"(i32 %out, i32 %a, i32 %b)
+    ret i32 %out
+}
+
+define spir_func i32 @__rocm_hfma_w1_w1_w1_preserve(i32 %c, i32 %a, i32 %b) #1 {
     tail call void asm sideeffect "v_mul_f16_sdwa $0, $1, $2 dst_sel:WORD_1 dst_unused:UNUSED_PRESERVE src0_sel:WORD_1 src1_sel:WORD_1","v,v,v"(i32 %c, i32 %a, i32 %b)
     ret i32 %c
 }
