@@ -31,5 +31,22 @@ ffma.1.device:
 ffma.1.host:
 	$(HIPCC) ffma.1.cpp -o ffma.1
 
+hfma.2.device:
+	$(LLC) -mtriple $(TARGET) -march=amdgcn -mcpu=$(CPU) hfma.2.ll
+	$(CLANG) -x assembler -target $(TARGET) -mcpu=$(CPU) -c -o hfma.2.o hfma.2.s
+	$(CLANG) -target $(TARGET) hfma.2.o -o hfma.2.co
+
+
+hfma.2.code:
+	$(CLANG) -x assembler -target $(TARGET) -mcpu=$(CPU) -c -o hfma.2.o hfma.2.s
+	$(CLANG) -target $(TARGET) hfma.2.o -o hfma.2.co
+
+
+
+hfma.2.host:
+	$(HIPCC) hfma.2.cpp -o hfma.2
+
+
+
 clean:
-	rm -r -f *.co *.o *.s hadd2.1 hmul2.1 ffma.1
+	rm -r -f *.co *.o *.s hadd2.1 hmul2.1 ffma.1 hfma.2

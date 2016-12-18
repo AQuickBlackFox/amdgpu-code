@@ -3,19 +3,21 @@ source_filename = "ffma.cpp"
 target datalayout = "e-p:32:32-p1:64:64-p2:64:64-p3:32:32-p4:64:64-p5:32:32-i64:64-v16:16-v24:32-v32:32-v48:64-v96:128-v192:256-v256:256-v512:512-v1024:1024-v2048:2048-n32:64"
 target triple = "amdgcn--amdhsa-hcc"
 
-define half @__rocm_hfma(half %a, half %b, i32 %c) {
+define half @__rocm_hfma(half %a, half %b, half %c) {
   %1 = bitcast half %a to i16
   %2 = bitcast half %b to i16
-  %3 = zext i16 %1 to i32
-  %4 = zext i16 %2 to i32
-  %5 = tail call i32 asm sideeffect "v_mad_f16 $0, $1, $2, $3","=v,v,v,v"(i32 %3, i32 %4, i32 %c)
-  %6 = trunc i32 %5 to i16
-  %7 = bitcast i16 %6 to half
-  ret half %7
+  %3 = bitcast half %c to i16
+  %4 = zext i16 %1 to i32
+  %5 = zext i16 %2 to i32
+  %6 = zext i16 %3 to i32
+  %7 = tail call i32 asm sideeffect "v_mad_f16 $0, $1, $2, $3","=v,v,v,v"(i32 %4, i32 %5, i32 %6)
+  %8 = trunc i32 %7 to i16
+  %9 = bitcast i16 %8 to half
+  ret half %9
 }
 
 ; Function Attrs: alwaysinline nounwind
-define void @_Z6DoFFma16grid_launch_parmPDhS0_S0_(half* nocapture readonly %in1d, half* nocapture readnone %in2d, half* nocapture %outd) local_unnamed_addr #5 {
+define amdgpu_kernel void @DoHFma(half* nocapture readonly %in1d, half* nocapture readnone %in2d, half* nocapture %outd) local_unnamed_addr #5 {
   %1 = tail call i32 @llvm.amdgcn.workitem.id.x() #11
   %arrayidx = getelementptr inbounds half, half* %in1d, i32 %1
   %2 = load half, half* %arrayidx, align 2, !tbaa !7
@@ -30,38 +32,38 @@ define void @_Z6DoFFma16grid_launch_parmPDhS0_S0_(half* nocapture readonly %in1d
 ; <label>:5:                                      ; preds = %5, %0
   %i.022 = phi i32 [ 0, %0 ], [ %inc.31, %5 ]
   %out.021 = phi half [ %3, %0 ], [ %mul.31, %5 ]
-  %mul = call half @__rocm_hfma(half %2, half %out.021, i32 13653)
-  %mul.1 = call half @__rocm_hfma(half %2, half %mul, i32 13653)
-  %mul.2 = call half @__rocm_hfma(half %2, half %mul.1, i32 13653)
-  %mul.3 = call half @__rocm_hfma(half %2, half %mul.2, i32 13653)
-  %mul.4 = call half @__rocm_hfma(half %2, half %mul.3, i32 13653)
-  %mul.5 = call half @__rocm_hfma(half %2, half %mul.4, i32 13653)
-  %mul.6 = call half @__rocm_hfma(half %2, half %mul.5, i32 13653)
-  %mul.7 = call half @__rocm_hfma(half %2, half %mul.6, i32 13653)
-  %mul.8 = call half @__rocm_hfma(half %2, half %mul.7, i32 13653)
-  %mul.9 = call half @__rocm_hfma(half %2, half %mul.8, i32 13653)
-  %mul.10 = call half @__rocm_hfma(half %2, half %mul.9, i32 13653)
-  %mul.11 = call half @__rocm_hfma(half %2, half %mul.10, i32 13653)
-  %mul.12 = call half @__rocm_hfma(half %2, half %mul.11, i32 13653)
-  %mul.13 = call half @__rocm_hfma(half %2, half %mul.12, i32 13653)
-  %mul.14 = call half @__rocm_hfma(half %2, half %mul.13, i32 13653)
-  %mul.15 = call half @__rocm_hfma(half %2, half %mul.14, i32 13653)
-  %mul.16 = call half @__rocm_hfma(half %2, half %mul.15, i32 13653)
-  %mul.17 = call half @__rocm_hfma(half %2, half %mul.16, i32 13653)
-  %mul.18 = call half @__rocm_hfma(half %2, half %mul.17, i32 13653)
-  %mul.19 = call half @__rocm_hfma(half %2, half %mul.18, i32 13653)
-  %mul.20 = call half @__rocm_hfma(half %2, half %mul.19, i32 13653)
-  %mul.21 = call half @__rocm_hfma(half %2, half %mul.20, i32 13653)
-  %mul.22 = call half @__rocm_hfma(half %2, half %mul.21, i32 13653)
-  %mul.23 = call half @__rocm_hfma(half %2, half %mul.22, i32 13653)
-  %mul.24 = call half @__rocm_hfma(half %2, half %mul.23, i32 13653)
-  %mul.25 = call half @__rocm_hfma(half %2, half %mul.24, i32 13653)
-  %mul.26 = call half @__rocm_hfma(half %2, half %mul.25, i32 13653)
-  %mul.27 = call half @__rocm_hfma(half %2, half %mul.26, i32 13653)
-  %mul.28 = call half @__rocm_hfma(half %2, half %mul.27, i32 13653)
-  %mul.29 = call half @__rocm_hfma(half %2, half %mul.28, i32 13653)
-  %mul.30 = call half @__rocm_hfma(half %2, half %mul.29, i32 13653)
-  %mul.31 = call half @__rocm_hfma(half %2, half %mul.30, i32 13653)
+  %mul = call half @__rocm_hfma(half %2, half %out.021, half %2)
+  %mul.1 = call half @__rocm_hfma(half %2, half %mul, half %2)
+  %mul.2 = call half @__rocm_hfma(half %2, half %mul.1, half %2)
+  %mul.3 = call half @__rocm_hfma(half %2, half %mul.2, half %2)
+  %mul.4 = call half @__rocm_hfma(half %2, half %mul.3, half %2)
+  %mul.5 = call half @__rocm_hfma(half %2, half %mul.4, half %2)
+  %mul.6 = call half @__rocm_hfma(half %2, half %mul.5, half %2)
+  %mul.7 = call half @__rocm_hfma(half %2, half %mul.6, half %2)
+  %mul.8 = call half @__rocm_hfma(half %2, half %mul.7, half %2)
+  %mul.9 = call half @__rocm_hfma(half %2, half %mul.8, half %2)
+  %mul.10 = call half @__rocm_hfma(half %2, half %mul.9, half %2)
+  %mul.11 = call half @__rocm_hfma(half %2, half %mul.10, half %2)
+  %mul.12 = call half @__rocm_hfma(half %2, half %mul.11, half %2)
+  %mul.13 = call half @__rocm_hfma(half %2, half %mul.12, half %2)
+  %mul.14 = call half @__rocm_hfma(half %2, half %mul.13, half %2)
+  %mul.15 = call half @__rocm_hfma(half %2, half %mul.14, half %2)
+  %mul.16 = call half @__rocm_hfma(half %2, half %mul.15, half %2)
+  %mul.17 = call half @__rocm_hfma(half %2, half %mul.16, half %2)
+  %mul.18 = call half @__rocm_hfma(half %2, half %mul.17, half %2)
+  %mul.19 = call half @__rocm_hfma(half %2, half %mul.18, half %2)
+  %mul.20 = call half @__rocm_hfma(half %2, half %mul.19, half %2)
+  %mul.21 = call half @__rocm_hfma(half %2, half %mul.20, half %2)
+  %mul.22 = call half @__rocm_hfma(half %2, half %mul.21, half %2)
+  %mul.23 = call half @__rocm_hfma(half %2, half %mul.22, half %2)
+  %mul.24 = call half @__rocm_hfma(half %2, half %mul.23, half %2)
+  %mul.25 = call half @__rocm_hfma(half %2, half %mul.24, half %2)
+  %mul.26 = call half @__rocm_hfma(half %2, half %mul.25, half %2)
+  %mul.27 = call half @__rocm_hfma(half %2, half %mul.26, half %2)
+  %mul.28 = call half @__rocm_hfma(half %2, half %mul.27, half %2)
+  %mul.29 = call half @__rocm_hfma(half %2, half %mul.28, half %2)
+  %mul.30 = call half @__rocm_hfma(half %2, half %mul.29, half %2)
+  %mul.31 = call half @__rocm_hfma(half %2, half %mul.30, half %2)
 
 
   %inc.31 = add nsw i32 %i.022, 32
