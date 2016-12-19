@@ -7,8 +7,8 @@
 
 typedef short __half;
 
-#define fileName "hfma.2.co"
-#define kernelName "DoHFMA"
+#define fileName "hmul.3.co"
+#define kernelName "DoHMul"
 
 #define CU_COUNT 64
 
@@ -27,16 +27,14 @@ unsigned long long dtime_usec(unsigned long long start){
 }
 
 int main() {
-  __half *Ah, *Bh, *Ch;
-  hipDeviceptr_t Ad, Bd, Cd;
+  __half *Ah, *Bh;
+  hipDeviceptr_t Ad, Bd;
   Ah = new __half[WI];
   Bh = new __half[WI];
-  Ch = new __half[WI];
 
   for(unsigned i=0;i<WI;i++) {
     Ah[i] = VAL;
     Bh[i] = 0;
-    Ch[i] = VAL;
   }
 
   hipInit(0);
@@ -49,11 +47,9 @@ int main() {
 
   hipMalloc((void**)&Ad, SIZE);
   hipMalloc((void**)&Bd, SIZE);
-  hipMalloc((void**)&Cd, SIZE);
 
   hipMemcpyHtoD(Ad, Ah, SIZE);
   hipMemcpyHtoD(Bd, Bh, SIZE);
-  hipMemcpyHtoD(Cd, Ch, SIZE);
 
   hipModuleLoad(&Module, fileName);
   hipModuleGetFunction(&Function, Module, kernelName);
@@ -61,12 +57,10 @@ int main() {
   struct {
     void *Ad;
     void *Bd;
-    void *Cd;
   } args;
 
   args.Ad = Ad;
   args.Bd = Bd;
-  args.Cd = Cd;
 
   size_t size = sizeof(args);
 
@@ -87,7 +81,7 @@ int main() {
 
   float et = dt/(float)USECPSEC;
   unsigned long long Mops = ops/1000000;
-  std::cout<<et<<"s for "<<Mops<<" HFMAs"<<std::endl;
-  float tp = (Mops*2) / (et*1000000);
+  std::cout<<et<<"s for "<<Mops<<" Half Adds"<<std::endl;
+  float tp = (Mops) / (et*1000000);
   std::cout<<"Throughput: "<<tp<<" Tops/s"<<std::endl;
 }

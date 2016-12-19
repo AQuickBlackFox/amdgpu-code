@@ -12,7 +12,7 @@ define spir_func i32 @__rocm_hadd_w1_w1_w1_preserve(i32 %c, i32 %a, i32 %b) #1 {
     %2 = and i32 %b, 65535
     %3 = trunc i32 %1 to i16
     %4 = trunc i32 %2 to i16
-    %5 = @llvm.convert.from.fp16.f32(i
+    %5 = 
     tail call void asm sideeffect "v_add_f16_sdwa $0, $1, $2 dst_sel:WORD_1 dst_unused:UNUSED_PRESERVE src0_sel:WORD_1 src1_sel:WORD_1","v,v,v"(i32 %c, i32 %a, i32 %b)
     ret i32 %c
 }

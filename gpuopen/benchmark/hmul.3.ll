@@ -1,97 +1,108 @@
 ; ModuleID = '<stdin>'
-source_filename = "hfma.1.cpp"
+source_filename = "hadd.2.cpp"
 target datalayout = "e-p:32:32-p1:64:64-p2:64:64-p3:32:32-p4:64:64-p5:32:32-i64:64-v16:16-v24:32-v32:32-v48:64-v96:128-v192:256-v256:256-v512:512-v1024:1024-v2048:2048-n32:64"
 target triple = "amdgcn--amdhsa-hcc"
 
+define half @__rocm_hmul_cvt(half %a, half %b) {
+  %1 = bitcast half %a to i16
+  %2 = bitcast half %b to i16
+  %3 = call float @llvm.convert.from.fp16.f32(i16 %1)
+  %4 = call float @llvm.convert.from.fp16.f32(i16 %2)
+  %5 = fmul float %3, %4
+  %6 = call i16 @llvm.convert.to.fp16.f32(float %5)
+  %7 = bitcast i16 %6 to half
+  ret half %7
+}
+
 ; Function Attrs: alwaysinline nounwind
-define amdgpu_kernel void @DoHFMA(half* nocapture readonly %a, half* nocapture readonly %b, half* nocapture %c) local_unnamed_addr #5 {
+define amdgpu_kernel void @DoHMul(half* nocapture readonly %a, half* nocapture %b) local_unnamed_addr #5 {
   %1 = tail call i32 @llvm.amdgcn.workitem.id.x() #12
   %arrayidx = getelementptr inbounds half, half* %a, i32 %1
   %2 = load half, half* %arrayidx, align 2, !tbaa !7
   %arrayidx2 = getelementptr inbounds half, half* %b, i32 %1
   %3 = load half, half* %arrayidx2, align 2, !tbaa !7
-  %arrayidx4 = getelementptr inbounds half, half* %c, i32 %1
-  %4 = load half, half* %arrayidx4, align 2, !tbaa !7
-  br label %6
+  br label %5
 
-; <label>:5:                                      ; preds = %6
-  store half %add.31, half* %arrayidx4, align 2, !tbaa !7
+; <label>:4:                                      ; preds = %5
+  store half %add.63, half* %arrayidx2, align 2, !tbaa !7
   ret void
 
-; <label>:6:                                      ; preds = %6, %0
-  %i.020 = phi i32 [ 0, %0 ], [ %inc.31, %6 ]
-  %c0.019 = phi half [ %4, %0 ], [ %add.31, %6 ]
-  %mul = fmul half %2, %c0.019
-  %add = fadd half %3, %mul
-  %mul.1 = fmul half %2, %add
-  %add.1 = fadd half %3, %mul.1
-  %mul.2 = fmul half %2, %add.1
-  %add.2 = fadd half %3, %mul.2
-  %mul.3 = fmul half %2, %add.2
-  %add.3 = fadd half %3, %mul.3
-  %mul.4 = fmul half %2, %add.3
-  %add.4 = fadd half %3, %mul.4
-  %mul.5 = fmul half %2, %add.4
-  %add.5 = fadd half %3, %mul.5
-  %mul.6 = fmul half %2, %add.5
-  %add.6 = fadd half %3, %mul.6
-  %mul.7 = fmul half %2, %add.6
-  %add.7 = fadd half %3, %mul.7
-  %mul.8 = fmul half %2, %add.7
-  %add.8 = fadd half %3, %mul.8
-  %mul.9 = fmul half %2, %add.8
-  %add.9 = fadd half %3, %mul.9
-  %mul.10 = fmul half %2, %add.9
-  %add.10 = fadd half %3, %mul.10
-  %mul.11 = fmul half %2, %add.10
-  %add.11 = fadd half %3, %mul.11
-  %mul.12 = fmul half %2, %add.11
-  %add.12 = fadd half %3, %mul.12
-  %mul.13 = fmul half %2, %add.12
-  %add.13 = fadd half %3, %mul.13
-  %mul.14 = fmul half %2, %add.13
-  %add.14 = fadd half %3, %mul.14
-  %mul.15 = fmul half %2, %add.14
-  %add.15 = fadd half %3, %mul.15
-  %mul.16 = fmul half %2, %add.15
-  %add.16 = fadd half %3, %mul.16
-  %mul.17 = fmul half %2, %add.16
-  %add.17 = fadd half %3, %mul.17
-  %mul.18 = fmul half %2, %add.17
-  %add.18 = fadd half %3, %mul.18
-  %mul.19 = fmul half %2, %add.18
-  %add.19 = fadd half %3, %mul.19
-  %mul.20 = fmul half %2, %add.19
-  %add.20 = fadd half %3, %mul.20
-  %mul.21 = fmul half %2, %add.20
-  %add.21 = fadd half %3, %mul.21
-  %mul.22 = fmul half %2, %add.21
-  %add.22 = fadd half %3, %mul.22
-  %mul.23 = fmul half %2, %add.22
-  %add.23 = fadd half %3, %mul.23
-  %mul.24 = fmul half %2, %add.23
-  %add.24 = fadd half %3, %mul.24
-  %mul.25 = fmul half %2, %add.24
-  %add.25 = fadd half %3, %mul.25
-  %mul.26 = fmul half %2, %add.25
-  %add.26 = fadd half %3, %mul.26
-  %mul.27 = fmul half %2, %add.26
-  %add.27 = fadd half %3, %mul.27
-  %mul.28 = fmul half %2, %add.27
-  %add.28 = fadd half %3, %mul.28
-  %mul.29 = fmul half %2, %add.28
-  %add.29 = fadd half %3, %mul.29
-  %mul.30 = fmul half %2, %add.29
-  %add.30 = fadd half %3, %mul.30
-  %mul.31 = fmul half %2, %add.30
-  %add.31 = fadd half %3, %mul.31
-  %inc.31 = add nsw i32 %i.020, 32
-  %exitcond.31 = icmp eq i32 %inc.31, 134217728
-  br i1 %exitcond.31, label %5, label %6
+; <label>:5:                                      ; preds = %5, %0
+  %i.016 = phi i32 [ 0, %0 ], [ %inc.63, %5 ]
+  %b0.015 = phi half [ %3, %0 ], [ %add.63, %5 ]
+  %add = call half @__rocm_hmul_cvt(half %2, half %b0.015)
+  %add.1 = call half @__rocm_hmul_cvt(half %2, half %add)
+  %add.2 = call half @__rocm_hmul_cvt(half %2, half %add.1)
+  %add.3 = call half @__rocm_hmul_cvt(half %2, half %add.2)
+  %add.4 = call half @__rocm_hmul_cvt(half %2, half %add.3)
+  %add.5 = call half @__rocm_hmul_cvt(half %2, half %add.4)
+  %add.6 = call half @__rocm_hmul_cvt(half %2, half %add.5)
+  %add.7 = call half @__rocm_hmul_cvt(half %2, half %add.6)
+  %add.8 = call half @__rocm_hmul_cvt(half %2, half %add.7)
+  %add.9 = call half @__rocm_hmul_cvt(half %2, half %add.8)
+  %add.10 = call half @__rocm_hmul_cvt(half %2, half %add.9)
+  %add.11 = call half @__rocm_hmul_cvt(half %2, half %add.10)
+  %add.12 = call half @__rocm_hmul_cvt(half %2, half %add.11)
+  %add.13 = call half @__rocm_hmul_cvt(half %2, half %add.12)
+  %add.14 = call half @__rocm_hmul_cvt(half %2, half %add.13)
+  %add.15 = call half @__rocm_hmul_cvt(half %2, half %add.14)
+  %add.16 = call half @__rocm_hmul_cvt(half %2, half %add.15)
+  %add.17 = call half @__rocm_hmul_cvt(half %2, half %add.16)
+  %add.18 = call half @__rocm_hmul_cvt(half %2, half %add.17)
+  %add.19 = call half @__rocm_hmul_cvt(half %2, half %add.18)
+  %add.20 = call half @__rocm_hmul_cvt(half %2, half %add.19)
+  %add.21 = call half @__rocm_hmul_cvt(half %2, half %add.20)
+  %add.22 = call half @__rocm_hmul_cvt(half %2, half %add.21)
+  %add.23 = call half @__rocm_hmul_cvt(half %2, half %add.22)
+  %add.24 = call half @__rocm_hmul_cvt(half %2, half %add.23)
+  %add.25 = call half @__rocm_hmul_cvt(half %2, half %add.24)
+  %add.26 = call half @__rocm_hmul_cvt(half %2, half %add.25)
+  %add.27 = call half @__rocm_hmul_cvt(half %2, half %add.26)
+  %add.28 = call half @__rocm_hmul_cvt(half %2, half %add.27)
+  %add.29 = call half @__rocm_hmul_cvt(half %2, half %add.28)
+  %add.30 = call half @__rocm_hmul_cvt(half %2, half %add.29)
+  %add.31 = call half @__rocm_hmul_cvt(half %2, half %add.30)
+  %add.32 = call half @__rocm_hmul_cvt(half %2, half %add.31)
+  %add.33 = call half @__rocm_hmul_cvt(half %2, half %add.32)
+  %add.34 = call half @__rocm_hmul_cvt(half %2, half %add.33)
+  %add.35 = call half @__rocm_hmul_cvt(half %2, half %add.34)
+  %add.36 = call half @__rocm_hmul_cvt(half %2, half %add.35)
+  %add.37 = call half @__rocm_hmul_cvt(half %2, half %add.36)
+  %add.38 = call half @__rocm_hmul_cvt(half %2, half %add.37)
+  %add.39 = call half @__rocm_hmul_cvt(half %2, half %add.38)
+  %add.40 = call half @__rocm_hmul_cvt(half %2, half %add.39)
+  %add.41 = call half @__rocm_hmul_cvt(half %2, half %add.40)
+  %add.42 = call half @__rocm_hmul_cvt(half %2, half %add.41)
+  %add.43 = call half @__rocm_hmul_cvt(half %2, half %add.42)
+  %add.44 = call half @__rocm_hmul_cvt(half %2, half %add.43)
+  %add.45 = call half @__rocm_hmul_cvt(half %2, half %add.44)
+  %add.46 = call half @__rocm_hmul_cvt(half %2, half %add.45)
+  %add.47 = call half @__rocm_hmul_cvt(half %2, half %add.46)
+  %add.48 = call half @__rocm_hmul_cvt(half %2, half %add.47)
+  %add.49 = call half @__rocm_hmul_cvt(half %2, half %add.48)
+  %add.50 = call half @__rocm_hmul_cvt(half %2, half %add.49)
+  %add.51 = call half @__rocm_hmul_cvt(half %2, half %add.50)
+  %add.52 = call half @__rocm_hmul_cvt(half %2, half %add.51)
+  %add.53 = call half @__rocm_hmul_cvt(half %2, half %add.52)
+  %add.54 = call half @__rocm_hmul_cvt(half %2, half %add.53)
+  %add.55 = call half @__rocm_hmul_cvt(half %2, half %add.54)
+  %add.56 = call half @__rocm_hmul_cvt(half %2, half %add.55)
+  %add.57 = call half @__rocm_hmul_cvt(half %2, half %add.56)
+  %add.58 = call half @__rocm_hmul_cvt(half %2, half %add.57)
+  %add.59 = call half @__rocm_hmul_cvt(half %2, half %add.58)
+  %add.60 = call half @__rocm_hmul_cvt(half %2, half %add.59)
+  %add.61 = call half @__rocm_hmul_cvt(half %2, half %add.60)
+  %add.62 = call half @__rocm_hmul_cvt(half %2, half %add.61)
+  %add.63 = call half @__rocm_hmul_cvt(half %2, half %add.62)
+  %inc.63 = add nsw i32 %i.016, 64
+  %exitcond.63 = icmp eq i32 %inc.63, 134217728
+  br i1 %exitcond.63, label %4, label %5
 }
 
 ; Function Attrs: nounwind readnone
 declare i32 @llvm.amdgcn.workitem.id.x() local_unnamed_addr #6
+declare i16 @llvm.convert.to.fp16.f32(float)
+declare float @llvm.convert.from.fp16.f32(i16)
 
 attributes #0 = { "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="true" "no-frame-pointer-elim-non-leaf" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-features"="+fp64-denormals,-fp32-denormals" "unsafe-fp-math"="false" "use-soft-float"="false" }
 attributes #1 = { nounwind "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="true" "no-frame-pointer-elim-non-leaf" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-features"="+fp64-denormals,-fp32-denormals" "unsafe-fp-math"="false" "use-soft-float"="false" }
