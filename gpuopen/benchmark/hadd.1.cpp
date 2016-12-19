@@ -18,15 +18,12 @@ unsigned long long dtime_usec(unsigned long long start){
   return ((tv.tv_sec*USECPSEC)+tv.tv_usec)-start;
 }
 
-
 __global__ void DoHAdd(hipLaunchParm lp, __half *a, __half *b) {
   int tx = hipThreadIdx_x;
   __half a0 = a[tx];
   __half b0 = b[tx];
-  float c0;
   for(unsigned i=0;i<ITER;i++) {
-    c0 = (float)a0 + (float)b0;
-    b0 = (__half)c0;
+    b0 = a0 + b0;
   }
   b[tx] = b0;
 }

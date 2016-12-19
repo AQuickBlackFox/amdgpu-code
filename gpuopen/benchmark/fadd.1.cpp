@@ -20,25 +20,23 @@ unsigned long long dtime_usec(unsigned long long start){
   return ((tv.tv_sec*USECPSEC)+tv.tv_usec)-start;
 }
 
-__global__ void DoFFma(hipLaunchParm lp, float *in1d, float *in2d, float* outd) {
+__global__ void DoFAdd(hipLaunchParm lp, float *in1d, float* outd) {
     int tx = hipThreadIdx_x;
     float in1 = in1d[tx];
-    float in2 = in2d[tx];
     float out = outd[tx];
     for (int i = 0; i < ITER; i++) {
-      out = out * in1 + in2;
+      out = out + in1 ;
     }
     outd[tx] = out;
 }
 
 
 int main() {
-    float *in1d, *in2d, *outd;
+    float *in1d, *outd;
     hipMalloc((void**)&in1d, SSZ*4);
-    hipMalloc((void**)&in2d, SSZ*4);
     hipMalloc((void**)&outd, SSZ*4);
     unsigned long long dt = dtime_usec(0);
-    hipLaunchKernel(DoFAdd,dim3(BSZ), dim3(SSZ),0,0, in1d, in2d, outd);
+    hipLaunchKernel(DoFAdd,dim3(BSZ), dim3(SSZ),0,0,in1d, outd);
     hipDeviceSynchronize();
     dt = dtime_usec(dt);
     unsigned long long ops = ITER;
@@ -46,7 +44,7 @@ int main() {
     ops *= SSZ;
     float et = dt/(float)USECPSEC;
     unsigned long long Mops = ops/1000000;
-    std::cout<<et<<"s for "<< Mops << " FFMAs"<<std::endl;
-    float tp = (Mops*2)/(et*1000000);
+    std::cout<<et<<"s for "<< Mops << " FAdds"<<std::endl;
+    float tp = (Mops)/(et*1000000);
     std::cout << "Throughput: " << tp << " Tops/s" << std::endl;
 }
