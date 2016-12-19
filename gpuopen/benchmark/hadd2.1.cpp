@@ -1,22 +1,16 @@
 #include<iostream>
+#include<hip/hip_runtime_api.h>
+#include<hip/hip_runtime.h>
 #include<time.h>
 #include<sys/time.h>
-#include<hip/hip_runtime.h>
-#include<hip/hip_runtime_api.h>
-#include<iostream>
-
-#define fileName "hadd2.1.co"
-#define kernelName "DoHAdd2PK"
-
-#define CU_COUNT 64
-
 #define USECPSEC 1000000ULL
-#define ITER 1024*1024*128
-#define WI 64
-#define WG 40*CU_COUNT
-#define SIZE WI<<2
 
-#define VAL 0x35553555
+typedef __fp16 __half;
+
+#define WI 64
+#define SIZE 64<<1
+#define WG 40*64
+#define ITER 1024*1024*128
 
 unsigned long long dtime_usec(unsigned long long start){
   timeval tv;
@@ -24,71 +18,42 @@ unsigned long long dtime_usec(unsigned long long start){
   return ((tv.tv_sec*USECPSEC)+tv.tv_usec)-start;
 }
 
-int main() {
-  unsigned *Ah, *Bh, *Ch, *Dh;
-  hipDeviceptr_t Ad, Bd, Cd, Dd;
-  Ah = new unsigned[WI];
-  Bh = new unsigned[WI];
-  Ch = new unsigned[WI];
-  Dh = new unsigned[WI];
 
-  for(unsigned i=0;i<WI;i++) {
-    Ah[i] = VAL;
-    Bh[i] = VAL;
-    Ch[i] = 0;
-    Dh[i] = 0;
+__global__ void DoHAdd(hipLaunchParm lp, __half *a, __half *b) {
+  int tx = hipThreadIdx_x;
+  __half a0 = a[tx];
+  __half b0 = b[tx];
+  float c0;
+  for(unsigned i=0;i<ITER;i++) {
+    c0 = (float)a0 + (float)b0;
+    b0 = (__half)c0;
   }
+  b[tx] = b0;
+}
 
-  hipInit(0);
-  hipDevice_t device;
-  hipCtx_t context;
-  hipDeviceGet(&device, 0);
-  hipCtxCreate(&context, 0, device);
-  hipModule_t Module;
-  hipFunction_t Function;
-
-  hipMalloc((void**)&Ad, SIZE);
-  hipMalloc((void**)&Bd, SIZE);
-  hipMalloc((void**)&Cd, SIZE);
-  hipMalloc((void**)&Dd, SIZE);
-
-  hipMemcpyHtoD(Ad, Ah, SIZE);
-  hipMemcpyHtoD(Bd, Bh, SIZE);
-  hipMemcpyHtoD(Cd, Ch, SIZE);
-
-  hipModuleLoad(&Module, fileName);
-  hipModuleGetFunction(&Function, Module, kernelName);
-
-  struct {
-    void *Ad;
-    void *Bd;
-    void *Cd;
-  } args;
-
-  args.Ad = Ad;
-  args.Bd = Bd;
-  args.Cd = Cd;
-
-  size_t size = sizeof(args);
-
-  void *config[] = {
-    HIP_LAUNCH_PARAM_BUFFER_POINTER, &args,
-    HIP_LAUNCH_PARAM_BUFFER_SIZE, &size,
-    HIP_LAUNCH_PARAM_END
-  };
-
+int main() {
+  __half *ah, *bh;
+  __half *ad, *bd;
+  ah = new __half[WI];
+  bh = new __half[WI];
+  for(unsigned i=0;i<WI;i++) {
+    ah[i] = 0x3555;
+    bh[i] = 0;
+  }
+  hipMalloc(&ad, SIZE);
+  hipMalloc(&bd, SIZE);
+  hipMemcpy(ad, ah, SIZE, hipMemcpyHostToDevice);
+  hipMemcpy(bd, bh, SIZE, hipMemcpyHostToDevice);
   unsigned long long dt = dtime_usec(0);
-  hipModuleLaunchKernel(Function, 64*40,1,1, 64,1,1, 0, 0, NULL, (void**)&config);
+  hipLaunchKernel(DoHAdd, dim3(WG,1,1), dim3(WI,1,1), 0, 0, ad, bd);
   hipDeviceSynchronize();
-
   dt = dtime_usec(dt);
   unsigned long long ops = ITER;
-  ops *= WI;
   ops *= WG;
-
+  ops *= WI;
   float et = dt/(float)USECPSEC;
   unsigned long long Mops = ops/1000000;
-  std::cout<<et<<"s for "<<Mops<<" Half Adds"<<std::endl;
-  float tp = (Mops * 2) / (et*1000000);
+  std::cout<<et<<"s for "<<Mops<<" HAdd"<<std::endl;
+  float tp = (Mops)/(et*1000000);
   std::cout<<"Throughput: "<<tp<<" Tops/s"<<std::endl;
 }

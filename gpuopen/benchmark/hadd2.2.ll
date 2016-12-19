@@ -1,77 +1,67 @@
 
 
-declare half @llvm.amdgcn.workitem.id.x()
+declare i32 @llvm.amdgcn.workitem.id.x()
 
-define spir_func half @__rocm_hadd_nosdwa(half %a, half %b) #1 {
-    %1 = bitcast half %a to i16
-    %2 = bitcast half %b to i16
-    %3 = zext i16 %1 to i32
-    %4 = zext i16 %2 to i32
-    %5 = tail call i32 asm sideeffect "v_add_f16 $0, $1, $2","=v,v,v"(i32 %a, i32 %b)
-    %6 = trunc i32 %5 to i16
-    %7 = bitcast i16 %6 to half
-    ret half %out
+define spir_func i32 @__rocm_hadd_nosdwa(i32 %a, i32 %b) #1 {
+    %out = tail call i32 asm sideeffect "v_add_f16 $0, $1, $2","=v,v,v"(i32 %a, i32 %b)
+    ret i32 %out
 }
 
-define spir_func half @__rocm_hadd_w1_w1_w1_preserve(half %c, half %a, half %b) #1 {
-    %1 = bitcast half %a to i16
-    %2 = bitcast half %b to i16
-    %3 = bitcast half %c to i16
-    %4 = zext i16 %1 to 
-    tail call void asm sideeffect "v_add_f16_sdwa $0, $1, $2 dst_sel:WORD_1 dst_unused:UNUSED_PRESERVE src0_sel:WORD_1 src1_sel:WORD_1","v,v,v"(half %c, half %a, half %b)
-    ret half %c
+define spir_func i32 @__rocm_hadd_w1_w1_w1_preserve(i32 %c, i32 %a, i32 %b) #1 {
+    tail call void asm sideeffect "v_add_f16_sdwa $0, $1, $2 dst_sel:WORD_1 dst_unused:UNUSED_PRESERVE src0_sel:WORD_1 src1_sel:WORD_1","v,v,v"(i32 %c, i32 %a, i32 %b)
+    ret i32 %c
 }
 
-define spir_kernel void @DoHAdd2PK(half* nocapture readonly %a, half* nocapture readonly %b, half* nocapture %c) local_unnamed_addr #5 {
-  %1 = tail call half @llvm.amdgcn.workitem.id.x() #12
-  %arrayidx = getelementptr inbounds half, half* %a, half %1
-  %2 = load half, half* %arrayidx, align 4, !tbaa !7
-  %arrayidx2 = getelementptr inbounds half, half* %b, half %1
-  %3 = load half, half* %arrayidx2, align 4, !tbaa !7
+define spir_kernel void @DoHAdd2PK(i32* nocapture readonly %a, i32* nocapture readonly %b, i32* nocapture %c) local_unnamed_addr #5 {
+  %1 = tail call i32 @llvm.amdgcn.workitem.id.x() #12
+  %arrayidx = getelementptr inbounds i32, i32* %a, i32 %1
+  %2 = load i32, i32* %arrayidx, align 4, !tbaa !7
+  %arrayidx2 = getelementptr inbounds i32, i32* %b, i32 %1
+  %3 = load i32, i32* %arrayidx2, align 4, !tbaa !7
   br label %5
 
 ; <label>:4:                                      ; preds = %5
-  %arrayidx6 = getelementptr inbounds half, half* %c, half %1
-  store half %call4.15, half* %arrayidx6, align 4, !tbaa !7
+  %arrayidx6 = getelementptr inbounds i32, i32* %c, i32 %1
+  store i32 %call4.15, i32* %arrayidx6, align 4, !tbaa !7
   ret void
 
 ; <label>:5:                                      ; preds = %5, %0
-  %i.020 = phi half [ 0, %0 ], [ %inc.15, %5 ]
-  %b0.019 = phi half [ %3, %0 ], [ %call4.15, %5 ]
-  %call3 = tail call half @__rocm_hadd_nosdwa(half %2, half %b0.019) #13
-  %call4 = tail call half @__rocm_hadd_w1_w1_w1_preserve(half %call3, half %2, half %call3) #13
-  %call3.1 = tail call half @__rocm_hadd_nosdwa(half %2, half %call4) #13
-  %call4.1 = tail call half @__rocm_hadd_w1_w1_w1_preserve(half %call3.1, half %2, half %call3.1) #13
-  %call3.2 = tail call half @__rocm_hadd_nosdwa(half %2, half %call4.1) #13
-  %call4.2 = tail call half @__rocm_hadd_w1_w1_w1_preserve(half %call3.2, half %2, half %call3.2) #13
-  %call3.3 = tail call half @__rocm_hadd_nosdwa(half %2, half %call4.2) #13
-  %call4.3 = tail call half @__rocm_hadd_w1_w1_w1_preserve(half %call3.3, half %2, half %call3.3) #13
-  %call3.4 = tail call half @__rocm_hadd_nosdwa(half %2, half %call4.3) #13
-  %call4.4 = tail call half @__rocm_hadd_w1_w1_w1_preserve(half %call3.4, half %2, half %call3.4) #13
-  %call3.5 = tail call half @__rocm_hadd_nosdwa(half %2, half %call4.4) #13
-  %call4.5 = tail call half @__rocm_hadd_w1_w1_w1_preserve(half %call3.5, half %2, half %call3.5) #13
-  %call3.6 = tail call half @__rocm_hadd_nosdwa(half %2, half %call4.5) #13
-  %call4.6 = tail call half @__rocm_hadd_w1_w1_w1_preserve(half %call3.6, half %2, half %call3.6) #13
-  %call3.7 = tail call half @__rocm_hadd_nosdwa(half %2, half %call4.6) #13
-  %call4.7 = tail call half @__rocm_hadd_w1_w1_w1_preserve(half %call3.7, half %2, half %call3.7) #13
-  %call3.8 = tail call half @__rocm_hadd_nosdwa(half %2, half %call4.7) #13
-  %call4.8 = tail call half @__rocm_hadd_w1_w1_w1_preserve(half %call3.8, half %2, half %call3.8) #13
-  %call3.9 = tail call half @__rocm_hadd_nosdwa(half %2, half %call4.8) #13
-  %call4.9 = tail call half @__rocm_hadd_w1_w1_w1_preserve(half %call3.9, half %2, half %call3.9) #13
-  %call3.10 = tail call half @__rocm_hadd_nosdwa(half %2, half %call4.9) #13
-  %call4.10 = tail call half @__rocm_hadd_w1_w1_w1_preserve(half %call3.10, half %2, half %call3.10) #13
-  %call3.11 = tail call half @__rocm_hadd_nosdwa(half %2, half %call4.10) #13
-  %call4.11 = tail call half @__rocm_hadd_w1_w1_w1_preserve(half %call3.11, half %2, half %call3.11) #13
-  %call3.12 = tail call half @__rocm_hadd_nosdwa(half %2, half %call4.11) #13
-  %call4.12 = tail call half @__rocm_hadd_w1_w1_w1_preserve(half %call3.12, half %2, half %call3.12) #13
-  %call3.13 = tail call half @__rocm_hadd_nosdwa(half %2, half %call4.12) #13
-  %call4.13 = tail call half @__rocm_hadd_w1_w1_w1_preserve(half %call3.13, half %2, half %call3.13) #13
-  %call3.14 = tail call half @__rocm_hadd_nosdwa(half %2, half %call4.13) #13
-  %call4.14 = tail call half @__rocm_hadd_w1_w1_w1_preserve(half %call3.14, half %2, half %call3.14) #13
-  %call3.15 = tail call half @__rocm_hadd_nosdwa(half %2, half %call4.14) #13
-  %call4.15 = tail call half @__rocm_hadd_w1_w1_w1_preserve(half %call3.15, half %2, half %call3.15) #13
-  %inc.15 = add nsw half %i.020, 16
-  %exitcond.15 = icmp eq half %inc.15, 134217728
+  %i.020 = phi i32 [ 0, %0 ], [ %inc.15, %5 ]
+  %b0.019 = phi i32 [ %3, %0 ], [ %call4.15, %5 ]
+  %call3 = tail call i32 @__rocm_hadd_nosdwa(i32 %2, i32 %b0.019) #13
+  %call4 = tail call i32 @__rocm_hadd_w1_w1_w1_preserve(i32 %call3, i32 %2, i32 %call3) #13
+  %call3.1 = tail call i32 @__rocm_hadd_nosdwa(i32 %2, i32 %call4) #13
+  %call4.1 = tail call i32 @__rocm_hadd_w1_w1_w1_preserve(i32 %call3.1, i32 %2, i32 %call3.1) #13
+  %call3.2 = tail call i32 @__rocm_hadd_nosdwa(i32 %2, i32 %call4.1) #13
+  %call4.2 = tail call i32 @__rocm_hadd_w1_w1_w1_preserve(i32 %call3.2, i32 %2, i32 %call3.2) #13
+  %call3.3 = tail call i32 @__rocm_hadd_nosdwa(i32 %2, i32 %call4.2) #13
+  %call4.3 = tail call i32 @__rocm_hadd_w1_w1_w1_preserve(i32 %call3.3, i32 %2, i32 %call3.3) #13
+  %call3.4 = tail call i32 @__rocm_hadd_nosdwa(i32 %2, i32 %call4.3) #13
+  %call4.4 = tail call i32 @__rocm_hadd_w1_w1_w1_preserve(i32 %call3.4, i32 %2, i32 %call3.4) #13
+  %call3.5 = tail call i32 @__rocm_hadd_nosdwa(i32 %2, i32 %call4.4) #13
+  %call4.5 = tail call i32 @__rocm_hadd_w1_w1_w1_preserve(i32 %call3.5, i32 %2, i32 %call3.5) #13
+  %call3.6 = tail call i32 @__rocm_hadd_nosdwa(i32 %2, i32 %call4.5) #13
+  %call4.6 = tail call i32 @__rocm_hadd_w1_w1_w1_preserve(i32 %call3.6, i32 %2, i32 %call3.6) #13
+  %call3.7 = tail call i32 @__rocm_hadd_nosdwa(i32 %2, i32 %call4.6) #13
+  %call4.7 = tail call i32 @__rocm_hadd_w1_w1_w1_preserve(i32 %call3.7, i32 %2, i32 %call3.7) #13
+  %call3.8 = tail call i32 @__rocm_hadd_nosdwa(i32 %2, i32 %call4.7) #13
+  %call4.8 = tail call i32 @__rocm_hadd_w1_w1_w1_preserve(i32 %call3.8, i32 %2, i32 %call3.8) #13
+  %call3.9 = tail call i32 @__rocm_hadd_nosdwa(i32 %2, i32 %call4.8) #13
+  %call4.9 = tail call i32 @__rocm_hadd_w1_w1_w1_preserve(i32 %call3.9, i32 %2, i32 %call3.9) #13
+  %call3.10 = tail call i32 @__rocm_hadd_nosdwa(i32 %2, i32 %call4.9) #13
+  %call4.10 = tail call i32 @__rocm_hadd_w1_w1_w1_preserve(i32 %call3.10, i32 %2, i32 %call3.10) #13
+  %call3.11 = tail call i32 @__rocm_hadd_nosdwa(i32 %2, i32 %call4.10) #13
+  %call4.11 = tail call i32 @__rocm_hadd_w1_w1_w1_preserve(i32 %call3.11, i32 %2, i32 %call3.11) #13
+  %call3.12 = tail call i32 @__rocm_hadd_nosdwa(i32 %2, i32 %call4.11) #13
+  %call4.12 = tail call i32 @__rocm_hadd_w1_w1_w1_preserve(i32 %call3.12, i32 %2, i32 %call3.12) #13
+  %call3.13 = tail call i32 @__rocm_hadd_nosdwa(i32 %2, i32 %call4.12) #13
+  %call4.13 = tail call i32 @__rocm_hadd_w1_w1_w1_preserve(i32 %call3.13, i32 %2, i32 %call3.13) #13
+  %call3.14 = tail call i32 @__rocm_hadd_nosdwa(i32 %2, i32 %call4.13) #13
+  %call4.14 = tail call i32 @__rocm_hadd_w1_w1_w1_preserve(i32 %call3.14, i32 %2, i32 %call3.14) #13
+  %call3.15 = tail call i32 @__rocm_hadd_nosdwa(i32 %2, i32 %call4.14) #13
+  %call4.15 = tail call i32 @__rocm_hadd_w1_w1_w1_preserve(i32 %call3.15, i32 %2, i32 %call3.15) #13
+  %inc.15 = add nsw i32 %i.020, 16
+  %exitcond.15 = icmp eq i32 %inc.15, 134217728
   br i1 %exitcond.15, label %4, label %5
 }
 

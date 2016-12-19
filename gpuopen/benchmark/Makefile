@@ -58,4 +58,4 @@ hfma.2.host:
 	$(HIPCC) hfma.2.cpp -o hfma.2
 
 clean:
-	rm -r -f *.co *.o *.s hadd.1 hadd.2 hadd2.1 hmul2.1 ffma.1 hfma.1 hfma.2
+	rm -r -f *.co *.o *.s hadd.1 hadd.2 hadd2.1 hmul2.1 ffma.1 hfma.1 hfma.2 dump*
