@@ -5,17 +5,17 @@
 #include<sys/time.h>
 #define USECPSEC 1000000ULL
 
-typedef struct {
-  union {
-    unsigned x;
-    __fp16 y[2];
-  };
-} __half2;
+typedef unsigned __half2;
+
+#define point5 0x38003800
+#define one 0x3C003C00
 
 #define WI 64
 #define SIZE WI<<2
 #define WG 40*64
 #define ITER 1024*1024*128
+
+extern "C" __half2 __rocm_hadd_nosdwa(__half2, __half2);
 
 unsigned long long dtime_usec(unsigned long long start){
   timeval tv;
@@ -23,14 +23,26 @@ unsigned long long dtime_usec(unsigned long long start){
   return ((tv.tv_sec*USECPSEC)+tv.tv_usec)-start;
 }
 
+__device__ __half2 __rocm_hadd_low(__half2 a, __half2 b) {
+  return __rocm_hadd_nosdwa(a, b);
+}
+
+__device__ __half2 __rocm_hadd_high(__half2 a, __half2 b, __half2 c) {
+  __half2 a0 = a >> 16;
+  __half2 b0 = b >> 16;
+  __half2 c0 = __rocm_hadd_nosdwa(a0, b0);
+  c0 = c0 << 16;
+  return (c | c0);
+}
 
 __global__ void DoHAdd2PK(hipLaunchParm lp, __half2 *a, __half2 *b) {
   int tx = hipThreadIdx_x;
   __half2 a0 = a[tx];
   __half2 b0 = b[tx];
+  __half2 c0;
   for(unsigned i=0;i<ITER;i++) {
-    b0.y[0] = b0.y[0] + a0.y[0];
-    b0.y[1] = b0.y[1] + a0.y[1];
+    c0 = __rocm_hadd_low(a0, b0);
+    b0 = __rocm_hadd_high(a0, b0, c0);
   }
   b[tx] = b0;
 }
@@ -41,8 +53,8 @@ int main() {
   ah = new __half2[WI];
   bh = new __half2[WI];
   for(unsigned i=0;i<WI;i++) {
-    ah[i].x = 0x35553555;
-    bh[i].x = 0;
+    ah[i] = point5;
+    bh[i] = point5;
   }
   hipMalloc(&ad, SIZE);
   hipMalloc(&bd, SIZE);

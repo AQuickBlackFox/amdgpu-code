@@ -104,6 +104,32 @@ hadd2.2.device:
 hadd2.2.host:
 	$(HIPCC) hadd2.2.cpp -o hadd2.2
 
+hadd2.3.device:
+	$(LLC) -mtriple $(TARGET) -march=amdgcn -mcpu=$(CPU) hadd2.3.ll
+	$(CLANG) -x assembler -target $(TARGET) -mcpu=$(CPU) -c -o hadd2.3.o hadd2.3.s
+	$(CLANG) -target $(TARGET) hadd2.3.o -o hadd2.3.co
+
+hadd2.3.host:
+	$(HIPCC) hadd2.3.cpp -o hadd2.3
+
+hadd2.4.device:
+	$(LLC) -mtriple $(TARGET) -march=amdgcn -mcpu=$(CPU) hadd2.4.ll
+	$(CLANG) -x assembler -target $(TARGET) -mcpu=$(CPU) -c -o hadd2.4.o hadd2.4.s
+	$(CLANG) -target $(TARGET) hadd2.4.o -o hadd2.4.co
+
+hadd2.4.host:
+	$(HIPCC) hadd2.4.cpp -o hadd2.4
+
+
+
+hadd2.3.val.1.device:
+	$(LLC) -mtriple $(TARGET) -march=amdgcn -mcpu=$(CPU) hadd2.3.val.1.ll
+	$(CLANG) -x assembler -target $(TARGET) -mcpu=$(CPU) -c -o hadd2.3.val.1.o hadd2.3.val.1.s
+	$(CLANG) -target $(TARGET) hadd2.3.val.1.o -o hadd2.3.val.1.co
+
+hadd2.3.val.1.host:
+	$(HIPCC) hadd2.3.val.1.cpp -o hadd2.3.val.1
+
 
 
 hmul2.1.device:

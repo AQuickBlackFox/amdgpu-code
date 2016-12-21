@@ -42,7 +42,7 @@ define half @__rocm_hadd(half %a, half %b) {
 }
 
 ; Function Attrs: alwaysinline nounwind
-define void @_Z9DoHAdd2PK16grid_launch_parmP7__half2S1_(%struct.grid_launch_parm* byval nocapture readnone align 8 %lp, %struct.__half2* nocapture readonly %a, %struct.__half2* nocapture %b) local_unnamed_addr #5 {
+define amdgpu_kernel void @DoHAdd2PK(%struct.__half2* nocapture readonly %a, %struct.__half2* nocapture %b) local_unnamed_addr #5 {
   %1 = tail call i32 @llvm.amdgcn.workitem.id.x() #12
   %arrayidx = getelementptr inbounds %struct.__half2, %struct.__half2* %a, i32 %1
   %2 = bitcast %struct.__half2* %arrayidx to i8*

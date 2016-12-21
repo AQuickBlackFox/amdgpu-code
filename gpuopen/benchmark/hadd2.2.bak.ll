@@ -5,13 +5,13 @@ target triple = "amdgcn--amdhsa-hcc"
 
 ; Function Attrs: noinline norecurse nounwind readnone
 define i32 @_Z14__rocm_hadd_lojj(i32 %a, i32 %b) local_unnamed_addr #5 {
-  %add = add i32 %b, %a
-  %and = and i32 %add, 65535
-  ret i32 %and
+  %1 = tail call i32 asm "v_add_f16 $0, $1, $2","=v,v,v"(i32 %a, i32 %b)   
+  ret i32 %1
 }
 
 ; Function Attrs: noinline norecurse nounwind readnone
 define i32 @_Z14__rocm_hadd_hijjj(i32 %a, i32 %b, i32 %c) local_unnamed_addr #5 {
+  
   %shr = and i32 %a, -65536
   %shr17 = add i32 %shr, %b
   %and = and i32 %shr17, -65536
@@ -20,17 +20,57 @@ define i32 @_Z14__rocm_hadd_hijjj(i32 %a, i32 %b, i32 %c) local_unnamed_addr #5 
 }
 
 ; Function Attrs: alwaysinline nounwind
-define amdgpu_kernel void @DoHAdd2PK(i32* nocapture readonly %a, i32* nocapture %b) local_unnamed_addr #6 {
+define void @DoHAdd2PK(i32* nocapture readonly %a, i32* nocapture %b) local_unnamed_addr #6 {
   %call = tail call i64 @hc_get_workitem_id(i32 0) #13
   %1 = trunc i64 %call to i32
   %arrayidx = getelementptr inbounds i32, i32* %a, i32 %1
   %2 = load i32, i32* %arrayidx, align 4, !tbaa !7
   %arrayidx2 = getelementptr inbounds i32, i32* %b, i32 %1
   %3 = load i32, i32* %arrayidx2, align 4, !tbaa !7
-  %call3 = tail call i32 @_Z14__rocm_hadd_lojj(i32 %2, i32 %3) #14
-  %call4 = tail call i32 @_Z14__rocm_hadd_hijjj(i32 %2, i32 %3, i32 %call3) #14
-  store i32 %call4, i32* %arrayidx2, align 4, !tbaa !7
+  br label %5
+
+; <label>:4:                                      ; preds = %5
+  store i32 %call4.15, i32* %arrayidx2, align 4, !tbaa !7
   ret void
+
+; <label>:5:                                      ; preds = %5, %0
+  %i.021 = phi i32 [ 0, %0 ], [ %inc.15, %5 ]
+  %b0.020 = phi i32 [ %3, %0 ], [ %call4.15, %5 ]
+  %call3 = tail call i32 @_Z14__rocm_hadd_lojj(i32 %2, i32 %b0.020) #14
+  %call4 = tail call i32 @_Z14__rocm_hadd_hijjj(i32 %2, i32 %b0.020, i32 %call3) #14
+  %call3.1 = tail call i32 @_Z14__rocm_hadd_lojj(i32 %2, i32 %call4) #14
+  %call4.1 = tail call i32 @_Z14__rocm_hadd_hijjj(i32 %2, i32 %call4, i32 %call3.1) #14
+  %call3.2 = tail call i32 @_Z14__rocm_hadd_lojj(i32 %2, i32 %call4.1) #14
+  %call4.2 = tail call i32 @_Z14__rocm_hadd_hijjj(i32 %2, i32 %call4.1, i32 %call3.2) #14
+  %call3.3 = tail call i32 @_Z14__rocm_hadd_lojj(i32 %2, i32 %call4.2) #14
+  %call4.3 = tail call i32 @_Z14__rocm_hadd_hijjj(i32 %2, i32 %call4.2, i32 %call3.3) #14
+  %call3.4 = tail call i32 @_Z14__rocm_hadd_lojj(i32 %2, i32 %call4.3) #14
+  %call4.4 = tail call i32 @_Z14__rocm_hadd_hijjj(i32 %2, i32 %call4.3, i32 %call3.4) #14
+  %call3.5 = tail call i32 @_Z14__rocm_hadd_lojj(i32 %2, i32 %call4.4) #14
+  %call4.5 = tail call i32 @_Z14__rocm_hadd_hijjj(i32 %2, i32 %call4.4, i32 %call3.5) #14
+  %call3.6 = tail call i32 @_Z14__rocm_hadd_lojj(i32 %2, i32 %call4.5) #14
+  %call4.6 = tail call i32 @_Z14__rocm_hadd_hijjj(i32 %2, i32 %call4.5, i32 %call3.6) #14
+  %call3.7 = tail call i32 @_Z14__rocm_hadd_lojj(i32 %2, i32 %call4.6) #14
+  %call4.7 = tail call i32 @_Z14__rocm_hadd_hijjj(i32 %2, i32 %call4.6, i32 %call3.7) #14
+  %call3.8 = tail call i32 @_Z14__rocm_hadd_lojj(i32 %2, i32 %call4.7) #14
+  %call4.8 = tail call i32 @_Z14__rocm_hadd_hijjj(i32 %2, i32 %call4.7, i32 %call3.8) #14
+  %call3.9 = tail call i32 @_Z14__rocm_hadd_lojj(i32 %2, i32 %call4.8) #14
+  %call4.9 = tail call i32 @_Z14__rocm_hadd_hijjj(i32 %2, i32 %call4.8, i32 %call3.9) #14
+  %call3.10 = tail call i32 @_Z14__rocm_hadd_lojj(i32 %2, i32 %call4.9) #14
+  %call4.10 = tail call i32 @_Z14__rocm_hadd_hijjj(i32 %2, i32 %call4.9, i32 %call3.10) #14
+  %call3.11 = tail call i32 @_Z14__rocm_hadd_lojj(i32 %2, i32 %call4.10) #14
+  %call4.11 = tail call i32 @_Z14__rocm_hadd_hijjj(i32 %2, i32 %call4.10, i32 %call3.11) #14
+  %call3.12 = tail call i32 @_Z14__rocm_hadd_lojj(i32 %2, i32 %call4.11) #14
+  %call4.12 = tail call i32 @_Z14__rocm_hadd_hijjj(i32 %2, i32 %call4.11, i32 %call3.12) #14
+  %call3.13 = tail call i32 @_Z14__rocm_hadd_lojj(i32 %2, i32 %call4.12) #14
+  %call4.13 = tail call i32 @_Z14__rocm_hadd_hijjj(i32 %2, i32 %call4.12, i32 %call3.13) #14
+  %call3.14 = tail call i32 @_Z14__rocm_hadd_lojj(i32 %2, i32 %call4.13) #14
+  %call4.14 = tail call i32 @_Z14__rocm_hadd_hijjj(i32 %2, i32 %call4.13, i32 %call3.14) #14
+  %call3.15 = tail call i32 @_Z14__rocm_hadd_lojj(i32 %2, i32 %call4.14) #14
+  %call4.15 = tail call i32 @_Z14__rocm_hadd_hijjj(i32 %2, i32 %call4.14, i32 %call3.15) #14
+  %inc.15 = add nsw i32 %i.021, 16
+  %exitcond.15 = icmp eq i32 %inc.15, 1048576
+  br i1 %exitcond.15, label %4, label %5
 }
 
 ; Function Attrs: nounwind readnone
