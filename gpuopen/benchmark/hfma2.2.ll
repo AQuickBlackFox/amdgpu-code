@@ -1,65 +1,86 @@
 ; ModuleID = '<stdin>'
-
-; Doing HADD2PK using bitshift + conversion to float
-
-source_filename = "hadd2.3.cpp"
+source_filename = "hfma2.1.bak.cpp"
 target datalayout = "e-p:32:32-p1:64:64-p2:64:64-p3:32:32-p4:64:64-p5:32:32-i64:64-v16:16-v24:32-v32:32-v48:64-v96:128-v192:256-v256:256-v512:512-v1024:1024-v2048:2048-n32:64"
 target triple = "amdgcn--amdhsa-hcc"
 
 %struct.__half2 = type { %union.anon }
 %union.anon = type { i32 }
 
-declare float @llvm.convert.from.fp16.f32(i16)
-declare i16 @llvm.convert.to.fp16.f32(float)
-
-define half @__rocm_hadd_float(half %a, half %b) {
-  %1 = bitcast half %a to i16
-  %2 = bitcast half %b to i16
-  %3 = call float @llvm.convert.from.fp16.f32(i16 %1)
-  %4 = call float @llvm.convert.from.fp16.f32(i16 %2)
-  %5 = fadd float %3, %4
-  %6 = call i16 @llvm.convert.to.fp16.f32(float %5)
-  %7 = bitcast i16 %6 to half
-  ret half %7
-}
-
 ; Function Attrs: alwaysinline nounwind
-define amdgpu_kernel void @DoHAdd2PK(%struct.__half2* nocapture readonly %a, %struct.__half2* nocapture %b) local_unnamed_addr #6 {
+define amdgpu_kernel void @DoHFma2PK(%struct.__half2* nocapture readonly %a, %struct.__half2* nocapture readonly %b, %struct.__half2* nocapture %c) local_unnamed_addr #6 {
   %1 = tail call i32 @llvm.amdgcn.workitem.id.x() #13
   %a0.sroa.0.0..sroa_idx = getelementptr inbounds %struct.__half2, %struct.__half2* %a, i32 %1, i32 0, i32 0
   %a0.sroa.0.0.copyload = load i32, i32* %a0.sroa.0.0..sroa_idx, align 4
   %b0.sroa.0.0..sroa_idx = getelementptr inbounds %struct.__half2, %struct.__half2* %b, i32 %1, i32 0, i32 0
   %b0.sroa.0.0.copyload = load i32, i32* %b0.sroa.0.0..sroa_idx, align 4
+  %c0.sroa.0.0..sroa_idx = getelementptr inbounds %struct.__half2, %struct.__half2* %c, i32 %1, i32 0, i32 0
+  %c0.sroa.0.0.copyload = load i32, i32* %c0.sroa.0.0..sroa_idx, align 4
   %agg.tmp.sroa.0.sroa.0.0.extract.trunc = trunc i32 %a0.sroa.0.0.copyload to i16
   %agg.tmp.sroa.0.sroa.2.0.extract.shift = lshr i32 %a0.sroa.0.0.copyload, 16
+  %agg.tmp6.sroa.0.sroa.0.0.extract.trunc = trunc i32 %c0.sroa.0.0.copyload to i16
+  %agg.tmp6.sroa.0.sroa.2.0.extract.shift = lshr i32 %c0.sroa.0.0.copyload, 16
   %2 = bitcast i16 %agg.tmp.sroa.0.sroa.0.0.extract.trunc to half
+  %3 = bitcast i16 %agg.tmp6.sroa.0.sroa.0.0.extract.trunc to half
   %a0.sroa.0.0.extract.trunc.i = trunc i32 %agg.tmp.sroa.0.sroa.2.0.extract.shift to i16
-  %3 = bitcast i16 %a0.sroa.0.0.extract.trunc.i to half
-  br label %5
+  %4 = bitcast i16 %a0.sroa.0.0.extract.trunc.i to half
+  %c0.sroa.0.0.extract.trunc.i = trunc i32 %agg.tmp6.sroa.0.sroa.2.0.extract.shift to i16
+  %5 = bitcast i16 %c0.sroa.0.0.extract.trunc.i to half
+  br label %7
 
-; <label>:4:                                      ; preds = %5
-  store i32 %or.7, i32* %b0.sroa.0.0..sroa_idx, align 4
+; <label>:6:                                      ; preds = %7
+  store i32 %or.7, i32* %c0.sroa.0.0..sroa_idx, align 4
   ret void
 
-; <label>:5:                                      ; preds = %5, %0
-  %i.068 = phi i32 [ 0, %0 ], [ %inc.7, %5 ]
-  %b0.sroa.0.067 = phi i32 [ %b0.sroa.0.0.copyload, %0 ], [ %or.7, %5 ]
-  %agg.tmp3.sroa.0.sroa.0.0.extract.trunc = trunc i32 %b0.sroa.0.067 to i16
-  %agg.tmp3.sroa.0.sroa.2.0.extract.shift = lshr i32 %b0.sroa.0.067, 16
-  %6 = bitcast i16 %agg.tmp3.sroa.0.sroa.0.0.extract.trunc to half
-  %add.i = call half @__rocm_hadd_float(half %2, half %6)
-  %b0.sroa.0.0.extract.trunc.i = trunc i32 %agg.tmp3.sroa.0.sroa.2.0.extract.shift to i16
-  %7 = bitcast i16 %b0.sroa.0.0.extract.trunc.i to half
-  %add.i35 = call half @__rocm_hadd_float(half %3, half %7)
-  %8 = bitcast half %add.i to i16
-  %ref.tmp.sroa.0.0.insert.ext.7 = zext i16 %8 to i32
-  %9 = bitcast half %add.i35 to i16
-  %ref.tmp4.sroa.6.0.insert.ext.7 = zext i16 %9 to i32
-  %ref.tmp4.sroa.6.0.insert.shift.7 = shl nuw i32 %ref.tmp4.sroa.6.0.insert.ext.7, 16
-  %or.7 = or i32 %ref.tmp4.sroa.6.0.insert.shift.7, %ref.tmp.sroa.0.0.insert.ext.7
-  %inc.7 = add nsw i32 %i.068, 1
+; <label>:7:                                      ; preds = %7, %0
+  %i.088 = phi i32 [ 0, %0 ], [ %inc.7, %7 ]
+  %b0.sroa.0.087 = phi i32 [ %b0.sroa.0.0.copyload, %0 ], [ %or.7, %7 ]
+  %agg.tmp5.sroa.0.sroa.0.0.extract.trunc = trunc i32 %b0.sroa.0.087 to i16
+  %agg.tmp5.sroa.0.sroa.2.0.extract.shift = lshr i32 %b0.sroa.0.087, 16
+  %8 = bitcast i16 %agg.tmp5.sroa.0.sroa.0.0.extract.trunc to half
+  %mul.i = fmul half %2, %8
+  %add.i = fadd half %3, %mul.i
+  %b0.sroa.0.0.extract.trunc.i = trunc i32 %agg.tmp5.sroa.0.sroa.2.0.extract.shift to i16
+  %9 = bitcast i16 %b0.sroa.0.0.extract.trunc.i to half
+;  %mul.i47 = fmul half %4, %9
+;  %add.i48 = fadd half %5, %mul.i47
+;  %mul.i.1 = fmul half %2, %add.i
+;  %add.i.1 = fadd half %3, %mul.i.1
+;  %mul.i47.1 = fmul half %4, %add.i48
+;  %add.i48.1 = fadd half %5, %mul.i47.1
+;  %mul.i.2 = fmul half %2, %add.i.1
+;  %add.i.2 = fadd half %3, %mul.i.2
+;  %mul.i47.2 = fmul half %4, %add.i48.1
+;  %add.i48.2 = fadd half %5, %mul.i47.2
+;  %mul.i.3 = fmul half %2, %add.i.2
+;  %add.i.3 = fadd half %3, %mul.i.3
+;  %mul.i47.3 = fmul half %4, %add.i48.2
+;  %add.i48.3 = fadd half %5, %mul.i47.3
+;  %mul.i.4 = fmul half %2, %add.i.3
+;  %add.i.4 = fadd half %3, %mul.i.4
+;  %mul.i47.4 = fmul half %4, %add.i48.3
+;  %add.i48.4 = fadd half %5, %mul.i47.4
+;  %mul.i.5 = fmul half %2, %add.i.4
+;  %add.i.5 = fadd half %3, %mul.i.5
+;  %mul.i47.5 = fmul half %4, %add.i48.4
+;  %add.i48.5 = fadd half %5, %mul.i47.5
+;  %mul.i.6 = fmul half %2, %add.i.5
+;  %add.i.6 = fadd half %3, %mul.i.6
+;  %mul.i47.6 = fmul half %4, %add.i48.5
+;  %add.i48.6 = fadd half %5, %mul.i47.6
+;  %mul.i.7 = fmul half %2, %add.i.6
+;  %add.i.7 = fadd half %3, %mul.i.7
+;  %10 = bitcast half %add.i.7 to i16
+  %10 = bitcast half %add.i to i16
+  %ref.tmp.sroa.0.0.insert.ext.7 = zext i16 %10 to i32
+  %mul.i47 = fmul half %4, %9
+  %add.i48 = fadd half %5, %mul.i47
+  %11 = bitcast half %add.i48 to i16
+  %ref.tmp7.sroa.6.0.insert.ext.7 = zext i16 %11 to i32
+  %ref.tmp7.sroa.6.0.insert.shift.7 = shl nuw i32 %ref.tmp7.sroa.6.0.insert.ext.7, 16
+  %or.7 = or i32 %ref.tmp7.sroa.6.0.insert.shift.7, %ref.tmp.sroa.0.0.insert.ext.7
+  %inc.7 = add nsw i32 %i.088, 1
   %exitcond.7 = icmp eq i32 %inc.7, 134217728
-  br i1 %exitcond.7, label %4, label %5
+  br i1 %exitcond.7, label %6, label %7
 }
 
 ; Function Attrs: nounwind readnone

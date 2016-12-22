@@ -1,27 +1,10 @@
 ; ModuleID = '<stdin>'
-
-; Doing HADD2PK using bitshift + conversion to float
-
 source_filename = "hadd2.3.cpp"
 target datalayout = "e-p:32:32-p1:64:64-p2:64:64-p3:32:32-p4:64:64-p5:32:32-i64:64-v16:16-v24:32-v32:32-v48:64-v96:128-v192:256-v256:256-v512:512-v1024:1024-v2048:2048-n32:64"
 target triple = "amdgcn--amdhsa-hcc"
 
 %struct.__half2 = type { %union.anon }
 %union.anon = type { i32 }
-
-declare float @llvm.convert.from.fp16.f32(i16)
-declare i16 @llvm.convert.to.fp16.f32(float)
-
-define half @__rocm_hadd_float(half %a, half %b) {
-  %1 = bitcast half %a to i16
-  %2 = bitcast half %b to i16
-  %3 = call float @llvm.convert.from.fp16.f32(i16 %1)
-  %4 = call float @llvm.convert.from.fp16.f32(i16 %2)
-  %5 = fadd float %3, %4
-  %6 = call i16 @llvm.convert.to.fp16.f32(float %5)
-  %7 = bitcast i16 %6 to half
-  ret half %7
-}
 
 ; Function Attrs: alwaysinline nounwind
 define amdgpu_kernel void @DoHAdd2PK(%struct.__half2* nocapture readonly %a, %struct.__half2* nocapture %b) local_unnamed_addr #6 {
@@ -47,11 +30,11 @@ define amdgpu_kernel void @DoHAdd2PK(%struct.__half2* nocapture readonly %a, %st
   %agg.tmp3.sroa.0.sroa.0.0.extract.trunc = trunc i32 %b0.sroa.0.067 to i16
   %agg.tmp3.sroa.0.sroa.2.0.extract.shift = lshr i32 %b0.sroa.0.067, 16
   %6 = bitcast i16 %agg.tmp3.sroa.0.sroa.0.0.extract.trunc to half
-  %add.i = call half @__rocm_hadd_float(half %2, half %6)
+  %add.i = fadd half %2, %6
   %b0.sroa.0.0.extract.trunc.i = trunc i32 %agg.tmp3.sroa.0.sroa.2.0.extract.shift to i16
   %7 = bitcast i16 %b0.sroa.0.0.extract.trunc.i to half
-  %add.i35 = call half @__rocm_hadd_float(half %3, half %7)
-  %8 = bitcast half %add.i to i16
+  %add.i35 = fadd half %3, %7
+   %8 = bitcast half %add.i to i16
   %ref.tmp.sroa.0.0.insert.ext.7 = zext i16 %8 to i32
   %9 = bitcast half %add.i35 to i16
   %ref.tmp4.sroa.6.0.insert.ext.7 = zext i16 %9 to i32

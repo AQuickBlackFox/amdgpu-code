@@ -5,10 +5,10 @@
 #include<hip/hip_runtime_api.h>
 #include<iostream>
 
-typedef short __half;
+typedef unsigned __half2;
 
-#define fileName "hadd.2.co"
-#define kernelName "DoHAdd"
+#define fileName "hfma2.2.co"
+#define kernelName "DoHFma2PK"
 
 #define CU_COUNT 64
 
@@ -16,9 +16,9 @@ typedef short __half;
 #define ITER 1024*1024*128
 #define WI 64
 #define WG 40*CU_COUNT
-#define SIZE WI<<1
+#define SIZE WI<<2
 
-#define VAL 0x3555
+#define VAL 0x35553555
 
 unsigned long long dtime_usec(unsigned long long start){
   timeval tv;
@@ -27,14 +27,15 @@ unsigned long long dtime_usec(unsigned long long start){
 }
 
 int main() {
-  short *Ah, *Bh;
-  hipDeviceptr_t Ad, Bd;
-  Ah = new short[WI];
-  Bh = new short[WI];
-
+  unsigned *Ah, *Bh, *Ch;
+  hipDeviceptr_t Ad, Bd, Cd;
+  Ah = new unsigned[WI];
+  Bh = new unsigned[WI];
+  Ch = new unsigned[WI];
   for(unsigned i=0;i<WI;i++) {
     Ah[i] = VAL;
     Bh[i] = 0;
+    Ch[i] = 0;
   }
 
   hipInit(0);
@@ -47,21 +48,22 @@ int main() {
 
   hipMalloc((void**)&Ad, SIZE);
   hipMalloc((void**)&Bd, SIZE);
-
+  hipMalloc((void**)&Cd, SIZE);
   hipMemcpyHtoD(Ad, Ah, SIZE);
   hipMemcpyHtoD(Bd, Bh, SIZE);
-
+  hipMemcpyHtoD(Cd, Ch, SIZE);
   hipModuleLoad(&Module, fileName);
   hipModuleGetFunction(&Function, Module, kernelName);
 
   struct {
     void *Ad;
     void *Bd;
+    void *Cd;
   } args;
 
   args.Ad = Ad;
   args.Bd = Bd;
-
+  args.Cd = Cd;
   size_t size = sizeof(args);
 
   void *config[] = {
@@ -71,7 +73,7 @@ int main() {
   };
 
   unsigned long long dt = dtime_usec(0);
-  hipModuleLaunchKernel(Function, 64*40,1,1, 64,1,1, 0, 0, NULL, (void**)&config);
+  hipModuleLaunchKernel(Function, WG,1,1, WI,1,1, 0, 0, NULL, (void**)&config);
   hipDeviceSynchronize();
 
   dt = dtime_usec(dt);
@@ -81,7 +83,7 @@ int main() {
 
   float et = dt/(float)USECPSEC;
   unsigned long long Mops = ops/1000000;
-  std::cout<<et<<"s for "<<Mops<<" Half Adds"<<std::endl;
-  float tp = (Mops) / (et*1000000);
+  std::cout<<et<<"s for "<<Mops<<" Half FMAs"<<std::endl;
+  float tp = (Mops*4) / (et*1000000);
   std::cout<<"Throughput: "<<tp<<" Tops/s"<<std::endl;
 }

@@ -5,10 +5,10 @@
 #include<hip/hip_runtime_api.h>
 #include<iostream>
 
-typedef __fp16 __half;
+typedef unsigned __half2;
 
-#define fileName "hadd.3.co"
-#define kernelName "DoHAdd"
+#define fileName "hadd2.3.co"
+#define kernelName "DoHAdd2PK"
 
 #define CU_COUNT 64
 

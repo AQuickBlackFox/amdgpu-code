@@ -7,8 +7,8 @@
 
 typedef unsigned __half2;
 
-#define fileName "hadd2.3.co"
-#define kernelName "DoHAdd2PK"
+#define fileName "hmul2.3.co"
+#define kernelName "DoHMul2PK"
 
 #define CU_COUNT 64
 
@@ -71,7 +71,7 @@ int main() {
   };
 
   unsigned long long dt = dtime_usec(0);
-  hipModuleLaunchKernel(Function, 64*40,1,1, 64,1,1, 0, 0, NULL, (void**)&config);
+  hipModuleLaunchKernel(Function, WG,1,1, WI,1,1, 0, 0, NULL, (void**)&config);
   hipDeviceSynchronize();
 
   dt = dtime_usec(dt);
@@ -81,7 +81,7 @@ int main() {
 
   float et = dt/(float)USECPSEC;
   unsigned long long Mops = ops/1000000;
-  std::cout<<et<<"s for "<<Mops<<" Half Adds"<<std::endl;
-  float tp = (Mops) / (et*1000000);
+  std::cout<<et<<"s for "<<Mops<<" Half MULs"<<std::endl;
+  float tp = (Mops*2) / (et*1000000);
   std::cout<<"Throughput: "<<tp<<" Tops/s"<<std::endl;
 }

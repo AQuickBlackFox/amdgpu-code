@@ -5,10 +5,10 @@
 #include<hip/hip_runtime_api.h>
 #include<iostream>
 
-typedef short __half;
+typedef unsigned __half2;
 
-#define fileName "hadd.2.co"
-#define kernelName "DoHAdd"
+#define fileName "hmul2.2.co"
+#define kernelName "DoHMul2PK"
 
 #define CU_COUNT 64
 
@@ -16,9 +16,9 @@ typedef short __half;
 #define ITER 1024*1024*128
 #define WI 64
 #define WG 40*CU_COUNT
-#define SIZE WI<<1
+#define SIZE WI<<2
 
-#define VAL 0x3555
+#define VAL 0x35553555
 
 unsigned long long dtime_usec(unsigned long long start){
   timeval tv;
@@ -27,10 +27,10 @@ unsigned long long dtime_usec(unsigned long long start){
 }
 
 int main() {
-  short *Ah, *Bh;
+  unsigned *Ah, *Bh;
   hipDeviceptr_t Ad, Bd;
-  Ah = new short[WI];
-  Bh = new short[WI];
+  Ah = new unsigned[WI];
+  Bh = new unsigned[WI];
 
   for(unsigned i=0;i<WI;i++) {
     Ah[i] = VAL;
@@ -81,7 +81,7 @@ int main() {
 
   float et = dt/(float)USECPSEC;
   unsigned long long Mops = ops/1000000;
-  std::cout<<et<<"s for "<<Mops<<" Half Adds"<<std::endl;
-  float tp = (Mops) / (et*1000000);
+  std::cout<<et<<"s for "<<Mops<<" Half MULs"<<std::endl;
+  float tp = (Mops*2) / (et*1000000);
   std::cout<<"Throughput: "<<tp<<" Tops/s"<<std::endl;
 }
