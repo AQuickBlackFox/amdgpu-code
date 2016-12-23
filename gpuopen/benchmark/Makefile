@@ -212,6 +212,15 @@ hfma2.2.host:
 	$(HIPCC) hfma2.2.cpp -o hfma2.2
 
 
+hfma2.3.device:
+	$(LLC) -mtriple $(TARGET) -march=amdgcn -mcpu=$(CPU) hfma2.3.ll
+	$(CLANG) -x assembler -target $(TARGET) -mcpu=$(CPU) -c -o hfma2.3.o hfma2.3.s
+	$(CLANG) -target $(TARGET) hfma2.3.o -o hfma2.3.co
+
+hfma2.3.host:
+	$(HIPCC) hfma2.3.cpp -o hfma2.3
+
+
 
 clean:
 	rm -r -f *.co *.o *.s fadd.2 fmul.2 ffma.2 ffma.3 hadd.1 hadd.2 hadd.3 hmul.1 hmul.2 hmul.3 ffma.1 hfma.1 hfma.2 hadd2.1 hadd2.2 hadd2.3 hmul2.1 hmul2.2 hmul2.3 hfma2.1 hfma2.2 hfma2.3 dump*
