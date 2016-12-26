@@ -7,8 +7,8 @@
 #define USECPSEC 1000000ULL
 
 void Bench(float *In, float *Out){
-	for (int i = 0; i < ITER; i++){
-		for (int j = 0; j < WI; j++){
+	for (int j = 0; j < WI; j++){
+		for (int i = 0; i < ITER; i++){
 			Out[j] = Out[j] + In[j];
 		}
 	}
