@@ -23,9 +23,4 @@ int main() {
 	clock_t stop = clock();
 	double t = (double)(stop - start) / (CLOCKS_PER_SEC);
 	std::cout << (WI*ITER)/(t*1000000)<< std::endl;
-
-
-	unsigned long long ops = ITER;
-	ops *= WI;
-
 }
