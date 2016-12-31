@@ -60,6 +60,22 @@ ffma.3.host:
 	$(HIPCC) ffma.3.cpp -o ffma.3
 
 
+fmac.1.device:
+	$(LLC) -mtriple $(TARGET) -march=amdgcn -mcpu=$(CPU) fmac.1.ll
+	$(CLANG) -x assembler -target $(TARGET) -mcpu=$(CPU) -c -o fmac.1.o fmac.1.s
+	$(CLANG) -target $(TARGET) fmac.1.o -o fmac.1.co
+
+fmac.1.host:
+	$(HIPCC) fmac.1.cpp -o fmac.1
+
+fmac.2.device:
+	$(LLC) -mtriple $(TARGET) -march=amdgcn -mcpu=$(CPU) fmac.2.ll
+	$(CLANG) -x assembler -target $(TARGET) -mcpu=$(CPU) -c -o fmac.2.o fmac.2.s
+	$(CLANG) -target $(TARGET) fmac.2.o -o fmac.2.co
+
+fmac.2.host:
+	$(HIPCC) fmac.2.cpp -o fmac.2
+
 hadd.1.device:
 	$(LLC) -mtriple $(TARGET) -march=amdgcn -mcpu=$(CPU) hadd.1.ll
 	$(CLANG) -x assembler -target $(TARGET) -mcpu=$(CPU) -c -o hadd.1.o hadd.1.s
@@ -220,7 +236,25 @@ hfma2.3.device:
 hfma2.3.host:
 	$(HIPCC) hfma2.3.cpp -o hfma2.3
 
+hfma2.4.device:
+	$(LLC) -mtriple $(TARGET) -march=amdgcn -mcpu=$(CPU) hfma2.4.ll
+	$(CLANG) -x assembler -target $(TARGET) -mcpu=$(CPU) -c -o hfma2.4.o hfma2.4.s
+	$(CLANG) -target $(TARGET) hfma2.4.o -o hfma2.4.co
+
+hfma2.4.host:
+	$(HIPCC) hfma2.4.cpp -o hfma2.4
+
+hfma2.5.device:
+	$(LLC) -mtriple $(TARGET) -march=amdgcn -mcpu=$(CPU) hfma2.5.ll
+	$(CLANG) -x assembler -target $(TARGET) -mcpu=$(CPU) -c -o hfma2.5.o hfma2.5.s
+	$(CLANG) -target $(TARGET) hfma2.5.o -o hfma2.5.co
+
+hfma2.4.host:
+	$(HIPCC) hfma2.5.cpp -o hfma2.5
+
+
+
 
 
 clean:
-	rm -r -f *.co *.o *.s fadd.2 fmul.2 ffma.2 ffma.3 hadd.1 hadd.2 hadd.3 hmul.1 hmul.2 hmul.3 ffma.1 hfma.1 hfma.2 hadd2.1 hadd2.2 hadd2.3 hmul2.1 hmul2.2 hmul2.3 hfma2.1 hfma2.2 hfma2.3 dump*
+	rm -r -f *.co *.o *.s fadd.2 fmul.2 ffma.2 ffma.3 hadd.1 hadd.2 hadd.3 hmul.1 hmul.2 hmul.3 ffma.1 hfma.1 hfma.2 hadd2.1 hadd2.2 hadd2.3 hmul2.1 hmul2.2 hmul2.3 hfma2.1 hfma2.2 hfma2.3 hfma2.4 dump* a.out fmac.1 fmac.2
