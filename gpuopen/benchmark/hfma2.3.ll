@@ -32,26 +32,26 @@ define amdgpu_kernel void @DoHFma2PK(i32* nocapture readonly %a, i32* nocapture 
 ; <label>:6:                                      ; preds = %6, %0
   %i.026 = phi i32 [ 0, %0 ], [ %inc.7, %6 ]
   %b0.025 = phi i32 [ %3, %0 ], [ %call6.7, %6 ]
-;  %call5 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %b0.025, i32 %4) #13
-;  %call6 = tail call i32 @__rocm_hfma_high(i32 %2, i32 %b0.025, i32 %4, i32 %call5) #13
-;  %call5.1 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %call6, i32 %4) #13
-;  %call6.1 = tail call i32 @__rocm_hfma_high(i32 %2, i32 %call6, i32 %4, i32 %call5.1) #13
-;  %call5.2 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %call6.1, i32 %4) #13
-;  %call6.2 = tail call i32 @__rocm_hfma_high(i32 %2, i32 %call6.1, i32 %4, i32 %call5.2) #13
-;  %call5.3 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %call6.2, i32 %4) #13
-;  %call6.3 = tail call i32 @__rocm_hfma_high(i32 %2, i32 %call6.2, i32 %4, i32 %call5.3) #13
-;  %call5.4 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %call6.3, i32 %4) #13
-;  %call6.4 = tail call i32 @__rocm_hfma_high(i32 %2, i32 %call6.3, i32 %4, i32 %call5.4) #13
-;  %call5.5 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %call6.4, i32 %4) #13
-;  %call6.5 = tail call i32 @__rocm_hfma_high(i32 %2, i32 %call6.4, i32 %4, i32 %call5.5) #13
-;  %call5.6 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %call6.5, i32 %4) #13
-;  %call6.6 = tail call i32 @__rocm_hfma_high(i32 %2, i32 %call6.5, i32 %4, i32 %call5.6) #13
-;  %call5.7 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %call6.6, i32 %4) #13
-;  %call6.7 = tail call i32 @__rocm_hfma_high(i32 %2, i32 %call6.6, i32 %4, i32 %call5.7) #13
+  %call5 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %b0.025, i32 %4) #13
+  %call6 = tail call i32 @__rocm_hfma_high(i32 %2, i32 %b0.025, i32 %4, i32 %call5) #13
+  %call5.1 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %call6, i32 %4) #13
+  %call6.1 = tail call i32 @__rocm_hfma_high(i32 %2, i32 %call6, i32 %4, i32 %call5.1) #13
+  %call5.2 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %call6.1, i32 %4) #13
+  %call6.2 = tail call i32 @__rocm_hfma_high(i32 %2, i32 %call6.1, i32 %4, i32 %call5.2) #13
+  %call5.3 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %call6.2, i32 %4) #13
+  %call6.3 = tail call i32 @__rocm_hfma_high(i32 %2, i32 %call6.2, i32 %4, i32 %call5.3) #13
+  %call5.4 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %call6.3, i32 %4) #13
+  %call6.4 = tail call i32 @__rocm_hfma_high(i32 %2, i32 %call6.3, i32 %4, i32 %call5.4) #13
+  %call5.5 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %call6.4, i32 %4) #13
+  %call6.5 = tail call i32 @__rocm_hfma_high(i32 %2, i32 %call6.4, i32 %4, i32 %call5.5) #13
+  %call5.6 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %call6.5, i32 %4) #13
+  %call6.6 = tail call i32 @__rocm_hfma_high(i32 %2, i32 %call6.5, i32 %4, i32 %call5.6) #13
+  %call5.7 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %call6.6, i32 %4) #13
+  %call6.7 = tail call i32 @__rocm_hfma_high(i32 %2, i32 %call6.6, i32 %4, i32 %call5.7) #13
 ;  %call5.7 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %b0.025, i32 %4) #13
-  %call6.7 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %b0.025, i32 %4) #13
-  %inc.7 = add nsw i32 %i.026, 1
-  %exitcond.7 = icmp eq i32 %inc.7, 1
+;  %call6.7 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %b0.025, i32 %4) #13
+  %inc.7 = add nsw i32 %i.026, 8
+  %exitcond.7 = icmp eq i32 %inc.7, 134217728
   br i1 %exitcond.7, label %5, label %6
 }
 

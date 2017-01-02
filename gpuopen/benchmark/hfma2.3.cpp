@@ -13,9 +13,9 @@ typedef unsigned __half2;
 #define CU_COUNT 64
 
 #define USECPSEC 1000000ULL
-#define ITER 1//1024*1024*128
+#define ITER 1024*1024*128
 #define WI 64
-#define WG 1//40*CU_COUNT
+#define WG 40*CU_COUNT
 #define SIZE WI<<2
 
 #define point5 0x38003800
@@ -77,7 +77,7 @@ int main() {
   };
 
   unsigned long long dt = dtime_usec(0);
-  hipModuleLaunchKernel(Function, 1,1,1, WI,1,1, 0, 0, NULL, (void**)&config);
+  hipModuleLaunchKernel(Function, WG,1,1, WI,1,1, 0, 0, NULL, (void**)&config);
   hipDeviceSynchronize();
 
   dt = dtime_usec(dt);
@@ -88,7 +88,7 @@ int main() {
   float et = dt/(float)USECPSEC;
   unsigned long long Mops = ops/1000000;
   std::cout<<et<<"s for "<<Mops<<" Half MULs"<<std::endl;
-  float tp = (Mops*2) / (et*1000000);
+  float tp = (Mops*4) / (et*1000000);
   std::cout<<"Throughput: "<<tp<<" Tops/s"<<std::endl;
   hipMemcpyDtoH(Ch, Cd, SIZE);
   std::cout<<std::hex<<Ch[10]<<std::endl;

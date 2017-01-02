@@ -3,24 +3,28 @@ source_filename = "ffma.cpp"
 target datalayout = "e-p:32:32-p1:64:64-p2:64:64-p3:32:32-p4:64:64-p5:32:32-i64:64-v16:16-v24:32-v32:32-v48:64-v96:128-v192:256-v256:256-v512:512-v1024:1024-v2048:2048-n32:64"
 target triple = "amdgcn--amdhsa-hcc"
 
-define half @__rocm_hfma(half %a, half %b, i32 %c) {
+define half @__rocm_hfma(half %a, half %b, half %c) {
   %1 = bitcast half %a to i16
   %2 = bitcast half %b to i16
-  %3 = zext i16 %1 to i32
-  %4 = zext i16 %2 to i32
-  %5 = tail call i32 asm sideeffect "v_mad_f16 $0, $1, $2, $3","=v,v,v,v"(i32 %3, i32 %4, i32 %c)
-  %6 = trunc i32 %5 to i16
-  %7 = bitcast i16 %6 to half
-  ret half %7
+  %3 = bitcast half %c to i16
+  %4 = call float @llvm.convert.from.fp16.f32(i16 %1)
+  %5 = call float @llvm.convert.from.fp16.f32(i16 %2)
+  %6 = call float @llvm.convert.from.fp16.f32(i16 %3)
+  %7 = tail call float asm sideeffect "v_mad_f32 $0, $1, $2, $3","=v,v,v,v"(float %4, float %5, float %6)
+  %8 = call i16 @llvm.convert.to.fp16.f32(float %7)
+  %9 = bitcast i16 %8 to half
+  ret half %9
 }
 
 ; Function Attrs: alwaysinline nounwind
-define void @_Z6DoFFma16grid_launch_parmPDhS0_S0_(half* nocapture readonly %in1d, half* nocapture readnone %in2d, half* nocapture %outd) local_unnamed_addr #5 {
+define amdgpu_kernel void @DoHFMA(half* nocapture readonly %in1d, half* nocapture readnone %in2d, half* nocapture %outd) local_unnamed_addr #5 {
   %1 = tail call i32 @llvm.amdgcn.workitem.id.x() #11
   %arrayidx = getelementptr inbounds half, half* %in1d, i32 %1
   %2 = load half, half* %arrayidx, align 2, !tbaa !7
   %arrayidx4 = getelementptr inbounds half, half* %outd, i32 %1
   %3 = load half, half* %arrayidx4, align 2, !tbaa !7
+  %arrayidx5 = getelementptr inbounds half, half* %in2d, i32 %1
+  %c = load half, half* %arrayidx5, align 2, !tbaa !7
   br label %5
 
 ; <label>:4:                                      ; preds = %5
@@ -30,38 +34,38 @@ define void @_Z6DoFFma16grid_launch_parmPDhS0_S0_(half* nocapture readonly %in1d
 ; <label>:5:                                      ; preds = %5, %0
   %i.022 = phi i32 [ 0, %0 ], [ %inc.31, %5 ]
   %out.021 = phi half [ %3, %0 ], [ %mul.31, %5 ]
-  %mul = call half @__rocm_hfma(half %2, half %out.021, i32 13653)
-  %mul.1 = call half @__rocm_hfma(half %2, half %mul, i32 13653)
-  %mul.2 = call half @__rocm_hfma(half %2, half %mul.1, i32 13653)
-  %mul.3 = call half @__rocm_hfma(half %2, half %mul.2, i32 13653)
-  %mul.4 = call half @__rocm_hfma(half %2, half %mul.3, i32 13653)
-  %mul.5 = call half @__rocm_hfma(half %2, half %mul.4, i32 13653)
-  %mul.6 = call half @__rocm_hfma(half %2, half %mul.5, i32 13653)
-  %mul.7 = call half @__rocm_hfma(half %2, half %mul.6, i32 13653)
-  %mul.8 = call half @__rocm_hfma(half %2, half %mul.7, i32 13653)
-  %mul.9 = call half @__rocm_hfma(half %2, half %mul.8, i32 13653)
-  %mul.10 = call half @__rocm_hfma(half %2, half %mul.9, i32 13653)
-  %mul.11 = call half @__rocm_hfma(half %2, half %mul.10, i32 13653)
-  %mul.12 = call half @__rocm_hfma(half %2, half %mul.11, i32 13653)
-  %mul.13 = call half @__rocm_hfma(half %2, half %mul.12, i32 13653)
-  %mul.14 = call half @__rocm_hfma(half %2, half %mul.13, i32 13653)
-  %mul.15 = call half @__rocm_hfma(half %2, half %mul.14, i32 13653)
-  %mul.16 = call half @__rocm_hfma(half %2, half %mul.15, i32 13653)
-  %mul.17 = call half @__rocm_hfma(half %2, half %mul.16, i32 13653)
-  %mul.18 = call half @__rocm_hfma(half %2, half %mul.17, i32 13653)
-  %mul.19 = call half @__rocm_hfma(half %2, half %mul.18, i32 13653)
-  %mul.20 = call half @__rocm_hfma(half %2, half %mul.19, i32 13653)
-  %mul.21 = call half @__rocm_hfma(half %2, half %mul.20, i32 13653)
-  %mul.22 = call half @__rocm_hfma(half %2, half %mul.21, i32 13653)
-  %mul.23 = call half @__rocm_hfma(half %2, half %mul.22, i32 13653)
-  %mul.24 = call half @__rocm_hfma(half %2, half %mul.23, i32 13653)
-  %mul.25 = call half @__rocm_hfma(half %2, half %mul.24, i32 13653)
-  %mul.26 = call half @__rocm_hfma(half %2, half %mul.25, i32 13653)
-  %mul.27 = call half @__rocm_hfma(half %2, half %mul.26, i32 13653)
-  %mul.28 = call half @__rocm_hfma(half %2, half %mul.27, i32 13653)
-  %mul.29 = call half @__rocm_hfma(half %2, half %mul.28, i32 13653)
-  %mul.30 = call half @__rocm_hfma(half %2, half %mul.29, i32 13653)
-  %mul.31 = call half @__rocm_hfma(half %2, half %mul.30, i32 13653)
+  %mul = call half @__rocm_hfma(half %2, half %out.021, half %c)
+  %mul.1 = call half @__rocm_hfma(half %2, half %mul, half %c)
+  %mul.2 = call half @__rocm_hfma(half %2, half %mul.1, half %c)
+  %mul.3 = call half @__rocm_hfma(half %2, half %mul.2, half %c)
+  %mul.4 = call half @__rocm_hfma(half %2, half %mul.3, half %c)
+  %mul.5 = call half @__rocm_hfma(half %2, half %mul.4, half %c)
+  %mul.6 = call half @__rocm_hfma(half %2, half %mul.5, half %c)
+  %mul.7 = call half @__rocm_hfma(half %2, half %mul.6, half %c)
+  %mul.8 = call half @__rocm_hfma(half %2, half %mul.7, half %c)
+  %mul.9 = call half @__rocm_hfma(half %2, half %mul.8, half %c)
+  %mul.10 = call half @__rocm_hfma(half %2, half %mul.9, half %c)
+  %mul.11 = call half @__rocm_hfma(half %2, half %mul.10, half %c)
+  %mul.12 = call half @__rocm_hfma(half %2, half %mul.11, half %c)
+  %mul.13 = call half @__rocm_hfma(half %2, half %mul.12, half %c)
+  %mul.14 = call half @__rocm_hfma(half %2, half %mul.13, half %c)
+  %mul.15 = call half @__rocm_hfma(half %2, half %mul.14, half %c)
+  %mul.16 = call half @__rocm_hfma(half %2, half %mul.15, half %c)
+  %mul.17 = call half @__rocm_hfma(half %2, half %mul.16, half %c)
+  %mul.18 = call half @__rocm_hfma(half %2, half %mul.17, half %c)
+  %mul.19 = call half @__rocm_hfma(half %2, half %mul.18, half %c)
+  %mul.20 = call half @__rocm_hfma(half %2, half %mul.19, half %c)
+  %mul.21 = call half @__rocm_hfma(half %2, half %mul.20, half %c)
+  %mul.22 = call half @__rocm_hfma(half %2, half %mul.21, half %c)
+  %mul.23 = call half @__rocm_hfma(half %2, half %mul.22, half %c)
+  %mul.24 = call half @__rocm_hfma(half %2, half %mul.23, half %c)
+  %mul.25 = call half @__rocm_hfma(half %2, half %mul.24, half %c)
+  %mul.26 = call half @__rocm_hfma(half %2, half %mul.25, half %c)
+  %mul.27 = call half @__rocm_hfma(half %2, half %mul.26, half %c)
+  %mul.28 = call half @__rocm_hfma(half %2, half %mul.27, half %c)
+  %mul.29 = call half @__rocm_hfma(half %2, half %mul.28, half %c)
+  %mul.30 = call half @__rocm_hfma(half %2, half %mul.29, half %c)
+  %mul.31 = call half @__rocm_hfma(half %2, half %mul.30, half %c)
 
 
   %inc.31 = add nsw i32 %i.022, 32
@@ -71,6 +75,8 @@ define void @_Z6DoFFma16grid_launch_parmPDhS0_S0_(half* nocapture readonly %in1d
 
 ; Function Attrs: nounwind readnone
 declare i32 @llvm.amdgcn.workitem.id.x() local_unnamed_addr #6
+declare float @llvm.convert.from.fp16.f32(i16)
+declare i16 @llvm.convert.to.fp16.f32(float)
 
 attributes #0 = { "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="true" "no-frame-pointer-elim-non-leaf" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-features"="+fp64-denormals,-fp32-denormals" "unsafe-fp-math"="false" "use-soft-float"="false" }
 attributes #1 = { nounwind "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="true" "no-frame-pointer-elim-non-leaf" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-features"="+fp64-denormals,-fp32-denormals" "unsafe-fp-math"="false" "use-soft-float"="false" }

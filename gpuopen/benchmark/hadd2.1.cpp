@@ -82,6 +82,6 @@ int main() {
   float et = dt/(float)USECPSEC;
   unsigned long long Mops = ops/1000000;
   std::cout<<et<<"s for "<<Mops<<" Half ADDs"<<std::endl;
-  float tp = (Mops) / (et*1000000);
+  float tp = (Mops*2) / (et*1000000);
   std::cout<<"Throughput: "<<tp<<" Tops/s"<<std::endl;
 }

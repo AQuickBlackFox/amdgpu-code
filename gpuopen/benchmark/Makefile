@@ -122,6 +122,14 @@ hmul.3.device:
 hmul.3.host:
 	$(HIPCC) hmul.3.cpp -o hmul.3
 
+hfma.1.device:
+	$(LLC) -mtriple $(TARGET) -march=amdgcn -mcpu=$(CPU) hfma.1.ll
+	$(CLANG) -x assembler -target $(TARGET) -mcpu=$(CPU) -c -o hfma.1.o hfma.1.s
+	$(CLANG) -target $(TARGET) hfma.1.o -o hfma.1.co
+
+hfma.1.host:
+	$(HIPCC) hfma.1.cpp -o hfma.1
+
 
 
 hadd2.1.device:
@@ -196,9 +204,6 @@ hmul2.2.host:
 
 
 
-hfma.1.host:
-	$(HIPCC) hfma.1.cpp -o hfma.1
-
 hfma.2.device:
 	$(LLC) -mtriple $(TARGET) -march=amdgcn -mcpu=$(CPU) hfma.2.ll
 	$(CLANG) -x assembler -target $(TARGET) -mcpu=$(CPU) -c -o hfma.2.o hfma.2.s
@@ -249,7 +254,7 @@ hfma2.5.device:
 	$(CLANG) -x assembler -target $(TARGET) -mcpu=$(CPU) -c -o hfma2.5.o hfma2.5.s
 	$(CLANG) -target $(TARGET) hfma2.5.o -o hfma2.5.co
 
-hfma2.4.host:
+hfma2.5.host:
 	$(HIPCC) hfma2.5.cpp -o hfma2.5
 
 
