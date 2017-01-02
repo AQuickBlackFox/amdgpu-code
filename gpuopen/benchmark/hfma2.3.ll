@@ -3,15 +3,15 @@ source_filename = "hfma2.3.bak.cpp"
 target datalayout = "e-p:32:32-p1:64:64-p2:64:64-p3:32:32-p4:64:64-p5:32:32-i64:64-v16:16-v24:32-v32:32-v48:64-v96:128-v192:256-v256:256-v512:512-v1024:1024-v2048:2048-n32:64"
 target triple = "amdgcn--amdhsa-hcc"
 
-define i32 @__rocm_hfma_low(i32 %a, i32 %b, i32 %c) {
-  %1 = tail call i32 asm sideeffect "v_mad_f16 $0, $1, $2, $3","=v,v,v,v"(i32 %a, i32 %b, i32 %c)
-  ret i32 %1
+define i32 @__rocm_mad_low(i32 %a, i32 %b, i32 %c) #1 {
+    %1 = tail call i32 asm sideeffect "v_mad_f16 $0, $1, $2, $3","=v,v,v,v"(i32 %a, i32 %b, i32 %c)
+    ret i32 %1
 }
 
-define i32 @__rocm_hfma_high(i32 %a, i32 %b, i32 %c, i32 %d) {
-  tail call void asm sideeffect "v_mul_f16_sdwa $0, $1, $2 dst_sel:WORD_1 dst_unused:UNUSED_PRESERVE src0_sel:WORD_1 src1_sel:WORD_1","v,v,v"(i32 %d, i32 %a, i32 %b)
-  tail call void asm sideeffect "v_add_f16_sdwa $0, $1, $2 dst_sel:WORD_1 dst_unused:UNUSED_PRESERVE src0_sel:WORD_1 src1_sel:WORD_1","v,v,v"(i32 %d, i32 %d, i32 %c)
-  ret i32 %d
+define i32 @__rocm_mad_high(i32 %a, i32 %b, i32 %c, i32 %d) #1 {
+    tail call void asm sideeffect "v_mul_f16_sdwa $0, $1, $2 dst_sel:WORD_1 dst_unused:UNUSED_PRESERVE src0_sel:WORD_1 src1_sel:WORD_1","v,v,v"(i32 %d, i32 %a, i32 %b)
+    tail call void asm sideeffect "v_add_f16_sdwa $0, $1, $2 dst_sel:WORD_1 dst_unused:UNUSED_PRESERVE src0_sel:WORD_1 src1_sel:WORD_1","v,v,v"(i32 %d, i32 %d, i32 %c)
+    ret i32 %d
 }
 
 ; Function Attrs: alwaysinline
@@ -32,24 +32,22 @@ define amdgpu_kernel void @DoHFma2PK(i32* nocapture readonly %a, i32* nocapture 
 ; <label>:6:                                      ; preds = %6, %0
   %i.026 = phi i32 [ 0, %0 ], [ %inc.7, %6 ]
   %b0.025 = phi i32 [ %3, %0 ], [ %call6.7, %6 ]
-  %call5 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %b0.025, i32 %4) #13
-  %call6 = tail call i32 @__rocm_hfma_high(i32 %2, i32 %b0.025, i32 %4, i32 %call5) #13
-  %call5.1 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %call6, i32 %4) #13
-  %call6.1 = tail call i32 @__rocm_hfma_high(i32 %2, i32 %call6, i32 %4, i32 %call5.1) #13
-  %call5.2 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %call6.1, i32 %4) #13
-  %call6.2 = tail call i32 @__rocm_hfma_high(i32 %2, i32 %call6.1, i32 %4, i32 %call5.2) #13
-  %call5.3 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %call6.2, i32 %4) #13
-  %call6.3 = tail call i32 @__rocm_hfma_high(i32 %2, i32 %call6.2, i32 %4, i32 %call5.3) #13
-  %call5.4 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %call6.3, i32 %4) #13
-  %call6.4 = tail call i32 @__rocm_hfma_high(i32 %2, i32 %call6.3, i32 %4, i32 %call5.4) #13
-  %call5.5 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %call6.4, i32 %4) #13
-  %call6.5 = tail call i32 @__rocm_hfma_high(i32 %2, i32 %call6.4, i32 %4, i32 %call5.5) #13
-  %call5.6 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %call6.5, i32 %4) #13
-  %call6.6 = tail call i32 @__rocm_hfma_high(i32 %2, i32 %call6.5, i32 %4, i32 %call5.6) #13
-  %call5.7 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %call6.6, i32 %4) #13
-  %call6.7 = tail call i32 @__rocm_hfma_high(i32 %2, i32 %call6.6, i32 %4, i32 %call5.7) #13
-;  %call5.7 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %b0.025, i32 %4) #13
-;  %call6.7 = tail call i32 @__rocm_hfma_low(i32 %2, i32 %b0.025, i32 %4) #13
+  %call5 = tail call i32 @__rocm_mad_low(i32 %2, i32 %b0.025, i32 %4) #13
+  %call6 = tail call i32 @__rocm_mad_high(i32 %2, i32 %b0.025, i32 %4, i32 %call5) #13
+  %call5.1 = tail call i32 @__rocm_mad_low(i32 %2, i32 %call6, i32 %4) #13
+  %call6.1 = tail call i32 @__rocm_mad_high(i32 %2, i32 %call6, i32 %4, i32 %call5.1) #13
+  %call5.2 = tail call i32 @__rocm_mad_low(i32 %2, i32 %call6.1, i32 %4) #13
+  %call6.2 = tail call i32 @__rocm_mad_high(i32 %2, i32 %call6.1, i32 %4, i32 %call5.2) #13
+  %call5.3 = tail call i32 @__rocm_mad_low(i32 %2, i32 %call6.2, i32 %4) #13
+  %call6.3 = tail call i32 @__rocm_mad_high(i32 %2, i32 %call6.2, i32 %4, i32 %call5.3) #13
+  %call5.4 = tail call i32 @__rocm_mad_low(i32 %2, i32 %call6.3, i32 %4) #13
+  %call6.4 = tail call i32 @__rocm_mad_high(i32 %2, i32 %call6.3, i32 %4, i32 %call5.4) #13
+  %call5.5 = tail call i32 @__rocm_mad_low(i32 %2, i32 %call6.4, i32 %4) #13
+  %call6.5 = tail call i32 @__rocm_mad_high(i32 %2, i32 %call6.4, i32 %4, i32 %call5.5) #13
+  %call5.6 = tail call i32 @__rocm_mad_low(i32 %2, i32 %call6.5, i32 %4) #13
+  %call6.6 = tail call i32 @__rocm_mad_high(i32 %2, i32 %call6.5, i32 %4, i32 %call5.6) #13
+  %call5.7 = tail call i32 @__rocm_mad_low(i32 %2, i32 %call6.6, i32 %4) #13
+  %call6.7 = tail call i32 @__rocm_mad_high(i32 %2, i32 %call6.6, i32 %4, i32 %call5.7) #13
   %inc.7 = add nsw i32 %i.026, 8
   %exitcond.7 = icmp eq i32 %inc.7, 134217728
   br i1 %exitcond.7, label %5, label %6
@@ -109,3 +107,5 @@ attributes #15 = { nobuiltin noreturn }
 !29 = !{!30, !4, i64 56}
 !30 = !{!"_ZTSSt5ctypeIcE", !10, i64 16, !28, i64 24, !10, i64 32, !10, i64 40, !10, i64 48, !4, i64 56, !4, i64 57, !4, i64 313, !4, i64 569}
 !31 = !{!4, !4, i64 0}
+!32 = !{!33, !33, i64 0}
+!33 = !{!"_ZTSSt13_Ios_Fmtflags", !4, i64 0}
