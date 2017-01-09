@@ -7,7 +7,7 @@
 
 typedef unsigned __half2;
 
-#define fileName "hfma2.4.co"
+#define fileName "hfma2.5.co"
 #define kernelName "DoHFma2PK"
 
 #define CU_COUNT 64
@@ -37,7 +37,7 @@ int main() {
   for(unsigned i=0;i<WI;i++) {
     Ah[i] = point5;
     Bh[i] = one;
-    Ch[i] = point5;
+    Ch[i] = 0x0;
   }
 
   hipInit(0);
@@ -90,6 +90,8 @@ int main() {
   std::cout<<et<<"s for "<<Mops<<" Half MULs"<<std::endl;
   float tp = (Mops*4) / (et*1000000);
   std::cout<<"Throughput: "<<tp<<" Tops/s"<<std::endl;
+  hipMemcpyDtoH(Ah, Ad, SIZE);
+  hipMemcpyDtoH(Bh, Bd, SIZE);
   hipMemcpyDtoH(Ch, Cd, SIZE);
-  std::cout<<Ch[0]<<std::endl;
+  std::cout<<std::hex<<Ah[10]<<" "<<Bh[10]<<" "<<Ch[10]<<std::endl;
 }
