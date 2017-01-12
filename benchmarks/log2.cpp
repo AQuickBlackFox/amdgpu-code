@@ -5,8 +5,8 @@
 #include<hip/hip_runtime_api.h>
 #include<iostream>
 
-#define fileName "log.co"
-#define kernelName "DoLog"
+#define fileName "log2.co"
+#define kernelName "DoLog2"
 
 #define CU_COUNT 36
 
