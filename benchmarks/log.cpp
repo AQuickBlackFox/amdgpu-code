@@ -5,8 +5,8 @@
 #include<hip/hip_runtime_api.h>
 #include<iostream>
 
-#define fileName "fadd.2.co"
-#define kernelName "DoFAdd"
+#define fileName "log.co"
+#define kernelName "DoLog"
 
 #define CU_COUNT 36
 

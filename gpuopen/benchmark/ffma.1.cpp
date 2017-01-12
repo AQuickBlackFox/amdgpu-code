@@ -7,7 +7,7 @@
 #include <hip/hip_runtime_api.h>
 
 
-#define CU_COUNT 64
+#define CU_COUNT 36
 
 #define USECPSEC 1000000ULL
 #define ITER 1024*1024*128
@@ -39,7 +39,7 @@ int main() {
     hipMalloc((void**)&in2d, SIZE);
     hipMalloc((void**)&outd, SIZE);
     unsigned long long dt = dtime_usec(0);
-    hipLaunchKernel(DoFAdd,dim3(WG), dim3(WI),0,0, in1d, in2d, outd);
+    hipLaunchKernel(DoFFma,dim3(WG), dim3(WI),0,0, in1d, in2d, outd);
     hipDeviceSynchronize();
     dt = dtime_usec(dt);
     unsigned long long ops = ITER;
