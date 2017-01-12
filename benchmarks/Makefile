@@ -5,8 +5,7 @@ CLANG=$(LLVM_PATH)/bin/clang
 TARGET=amdgcn--amdhsa
 CPU=fiji
 
-all:
-	log2.device log2.host pow2.device pow2.host
+all: log2.device log2.host pow2.device pow2.host
 
 log2.device:
 	$(LLC) -mtriple $(TARGET) -march=amdgcn -mcpu=$(CPU) log2.ll
