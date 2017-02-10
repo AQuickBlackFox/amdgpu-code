@@ -4,16 +4,15 @@
 #include<hip/hip_runtime.h>
 #include<hip/hip_runtime_api.h>
 #include<iostream>
+#include"rocm_cu.h"
 
 typedef unsigned __half2;
 
 #define fileName "hmul2.1.co"
 #define kernelName "DoHMul2PK"
 
-#define CU_COUNT 64
-
 #define USECPSEC 1000000ULL
-#define ITER 1024*1024*128
+#define ITER 4194304
 #define WI 64
 #define WG 40*CU_COUNT
 #define SIZE WI<<2
@@ -71,7 +70,7 @@ int main() {
   };
 
   unsigned long long dt = dtime_usec(0);
-  hipModuleLaunchKernel(Function, 64*40,1,1, 64,1,1, 0, 0, NULL, (void**)&config);
+  hipModuleLaunchKernel(Function, WG,1,1, WI,1,1, 0, 0, NULL, (void**)&config);
   hipDeviceSynchronize();
 
   dt = dtime_usec(dt);

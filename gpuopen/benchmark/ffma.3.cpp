@@ -4,11 +4,10 @@
 #include<hip/hip_runtime.h>
 #include<hip/hip_runtime_api.h>
 #include<iostream>
+#include"rocm_cu.h"
 
 #define fileName "ffma.3.co"
 #define kernelName "DoFFma"
-
-#define CU_COUNT 64
 
 #define USECPSEC 1000000ULL
 #define ITER 1024*1024*128

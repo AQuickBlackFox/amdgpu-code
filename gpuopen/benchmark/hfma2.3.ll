@@ -49,7 +49,7 @@ define amdgpu_kernel void @DoHFma2PK(i32* nocapture readonly %a, i32* nocapture 
   %call5.7 = tail call i32 @__rocm_mad_low(i32 %2, i32 %call6.6, i32 %4) #13
   %call6.7 = tail call i32 @__rocm_mad_high(i32 %2, i32 %call6.6, i32 %4, i32 %call5.7) #13
   %inc.7 = add nsw i32 %i.026, 8
-  %exitcond.7 = icmp eq i32 %inc.7, 134217728
+  %exitcond.7 = icmp eq i32 %inc.7, 4194304
   br i1 %exitcond.7, label %5, label %6
 }
 

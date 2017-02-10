@@ -13,7 +13,7 @@ typedef unsigned __half2;
 #define CU_COUNT 64
 
 #define USECPSEC 1000000ULL
-#define ITER 1024*1024*128
+#define ITER 4194304
 #define WI 64
 #define WG 40*CU_COUNT
 #define SIZE WI<<2

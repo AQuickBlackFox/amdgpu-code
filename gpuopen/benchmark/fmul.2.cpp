@@ -8,7 +8,7 @@
 #define fileName "fmul.2.co"
 #define kernelName "DoFMul"
 
-#define CU_COUNT 64
+#define CU_COUNT 36
 
 #define USECPSEC 1000000ULL
 #define ITER 1024*1024*128

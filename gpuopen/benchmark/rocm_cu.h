@@ -4,4 +4,6 @@
 #define RX480  36
 #define R9NANO 64
 
-#define CU_COUNT R9NANO
+#define CU_COUNT RX480
+
+#endif

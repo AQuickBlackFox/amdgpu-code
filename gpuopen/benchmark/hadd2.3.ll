@@ -61,7 +61,7 @@ define amdgpu_kernel void @DoHAdd2PK(i32* nocapture readonly %a, i32* nocapture 
   %call3.15 = tail call i32 @__rocm_hadd_nosdwa(i32 %2, i32 %call4.14) #13
   %call4.15 = tail call i32 @__rocm_hadd_w1_w1_w1_preserve(i32 %call3.15, i32 %2, i32 %call3.15) #13
   %inc.15 = add nsw i32 %i.020, 16
-  %exitcond.15 = icmp eq i32 %inc.15, 134217728
+  %exitcond.15 = icmp eq i32 %inc.15, 4194304
   br i1 %exitcond.15, label %4, label %5
 }
 

@@ -4,16 +4,15 @@
 #include<hip/hip_runtime.h>
 #include<hip/hip_runtime_api.h>
 #include<iostream>
+#include"rocm_cu.h"
 
 typedef unsigned __half2;
 
 #define fileName "hfma2.3.co"
 #define kernelName "DoHFma2PK"
 
-#define CU_COUNT 64
-
 #define USECPSEC 1000000ULL
-#define ITER 1024*1024*128
+#define ITER 4194304
 #define WI 64
 #define WG 40*CU_COUNT
 #define SIZE WI<<2
@@ -90,6 +89,4 @@ int main() {
   std::cout<<et<<"s for "<<Mops<<" Half MULs"<<std::endl;
   float tp = (Mops*4) / (et*1000000);
   std::cout<<"Throughput: "<<tp<<" Tops/s"<<std::endl;
-  hipMemcpyDtoH(Ch, Cd, SIZE);
-  std::cout<<std::hex<<Ch[10]<<std::endl;
 }

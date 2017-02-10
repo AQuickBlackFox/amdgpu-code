@@ -1,5 +1,5 @@
 HIPCC=$(HIP_PATH)/bin/hipcc
-LLVM_PATH=~/rocm/llvm.rocm
+LLVM_PATH=~/rocm/llvm
 LLC=$(LLVM_PATH)/bin/llc
 CLANG=$(LLVM_PATH)/bin/clang
 TARGET=amdgcn--amdhsa

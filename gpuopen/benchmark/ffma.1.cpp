@@ -5,9 +5,7 @@
 #include <sys/time.h>
 #include <hip/hip_runtime.h>
 #include <hip/hip_runtime_api.h>
-
-
-#define CU_COUNT 36
+#include "rocm_cu.h"
 
 #define USECPSEC 1000000ULL
 #define ITER 1024*1024*128

@@ -4,16 +4,15 @@
 #include<hip/hip_runtime.h>
 #include<hip/hip_runtime_api.h>
 #include<iostream>
+#include"rocm_cu.h"
 
 typedef unsigned __half2;
 
 #define fileName "hfma2.2.co"
 #define kernelName "DoHFma2PK"
 
-#define CU_COUNT 64
-
 #define USECPSEC 1000000ULL
-#define ITER 1024*1024*128
+#define ITER 4194304
 #define WI 64
 #define WG 40*CU_COUNT
 #define SIZE WI<<2

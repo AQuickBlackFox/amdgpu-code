@@ -7,7 +7,7 @@
 #include <hip/hip_runtime_api.h>
 
 
-#define CU_COUNT 64
+#define CU_COUNT 36
 
 #define USECPSEC 1000000ULL
 #define ITER 1024*1024*128

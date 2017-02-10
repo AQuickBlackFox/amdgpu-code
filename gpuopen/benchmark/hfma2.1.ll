@@ -98,7 +98,7 @@ define amdgpu_kernel void @DoHFma2PK(%struct.__half2* nocapture readonly %a, %st
   %ref.tmp7.sroa.6.0.insert.shift.7 = shl nuw i32 %ref.tmp7.sroa.6.0.insert.ext.7, 16
   %or.7 = or i32 %ref.tmp7.sroa.6.0.insert.shift.7, %ref.tmp.sroa.0.0.insert.ext.7
   %inc.7 = add nsw i32 %i.088, 1
-  %exitcond.7 = icmp eq i32 %inc.7, 134217728
+  %exitcond.7 = icmp eq i32 %inc.7, 4194304
   br i1 %exitcond.7, label %6, label %7
 }
 
