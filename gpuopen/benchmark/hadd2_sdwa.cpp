@@ -5,10 +5,9 @@
 #include <sys/time.h>
 #include <hip/hip_runtime.h>
 #include <hip/hip_runtime_api.h>
+#include "rocm_cu.h"
 
 typedef unsigned __half2;
-
-#define CU_COUNT 64
 
 #define USECPSEC 1000000ULL
 #define ITER 1024*1024*128
@@ -68,7 +67,7 @@ int main() {
 
   float et = dt/(float)USECPSEC;
   unsigned long long Mops = ops/1000000;
-  std::cout<<et<<"s for "<<Mops<<" Half Adds"<<std::endl;
+  std::cout<<et<<"s for "<<Mops<<" Half2 ADDs"<<std::endl;
   float tp = (Mops * 2) / (et*1000000);
   std::cout<<"Throughput: "<<tp<<" Tops/s"<<std::endl;
 }

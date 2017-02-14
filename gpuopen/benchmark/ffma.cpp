@@ -48,7 +48,7 @@ int main() {
     ops *= SSZ;
     float et = dt/(float)USECPSEC;
     unsigned long long Mops = ops/1000000;
-    std::cout<<et<<"s for "<< Mops << " Mdp4a"<<std::endl;
+    std::cout<<et<<"s for "<< Mops << " Float FMAs"<<std::endl;
     float tp = (Mops*2)/(et*1000000);
     std::cout << "Throughput: " << tp << " Tops/s" << std::endl;
 }

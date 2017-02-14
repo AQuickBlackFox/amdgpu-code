@@ -3,14 +3,15 @@
 #include<hip/hip_runtime.h>
 #include<time.h>
 #include<sys/time.h>
-#define USECPSEC 1000000ULL
+#include"rocm_cu.h"
 
 typedef __fp16 __half;
 
-#define WI 64
-#define SIZE 64<<1
-#define WG 40*64
+#define USECPSEC 1000000ULL
 #define ITER 1024*1024*128
+#define WI 64
+#define WG 40*CU_COUNT
+#define SIZE WI<<1
 
 unsigned long long dtime_usec(unsigned long long start){
   timeval tv;
@@ -55,7 +56,7 @@ int main() {
   ops *= WI;
   float et = dt/(float)USECPSEC;
   unsigned long long Mops = ops/1000000;
-  std::cout<<et<<"s for "<<Mops<<" HFma"<<std::endl;
+  std::cout<<et<<"s for "<<Mops<<" Half FMAs"<<std::endl;
   float tp = (Mops)/(et*1000000);
   std::cout<<"Throughput: "<<2 * tp<<" Tops/s"<<std::endl;
 }

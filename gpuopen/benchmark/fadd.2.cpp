@@ -4,11 +4,10 @@
 #include<hip/hip_runtime.h>
 #include<hip/hip_runtime_api.h>
 #include<iostream>
+#include"rocm_cu.h"
 
 #define fileName "fadd.2.co"
 #define kernelName "DoFAdd"
-
-#define CU_COUNT 36
 
 #define USECPSEC 1000000ULL
 #define ITER 1024*1024*128
@@ -79,7 +78,7 @@ int main() {
 
   float et = dt/(float)USECPSEC;
   unsigned long long Mops = ops/1000000;
-  std::cout<<et<<"s for "<<Mops<<" Half Adds"<<std::endl;
+  std::cout<<et<<"s for "<<Mops<<" Float ADDs"<<std::endl;
   float tp = (Mops) / (et*1000000);
   std::cout<<"Throughput: "<<tp<<" Tops/s"<<std::endl;
 }
