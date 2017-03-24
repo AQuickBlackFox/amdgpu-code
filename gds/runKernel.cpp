@@ -28,8 +28,8 @@ int main(){
   hipMalloc(&Bd, SIZE);
   hipMalloc(&Cd, SIZE);
   hipMemcpyHtoD(Ad, A, SIZE);
-  hipMemcpyHtoD(Ad, A, SIZE);
-  hipMemcpyHtoD(Ad, A, SIZE);
+  hipMemcpyHtoD(Bd, B, SIZE);
+  hipMemcpyHtoD(Cd, C, SIZE);
   hipModule_t module;
   hipFunction_t function;
   hipModuleLoad(&module, fileName);

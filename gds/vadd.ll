@@ -1,6 +1,6 @@
 declare i32 @llvm.amdgcn.workitem.id.x()
 
-define amdgpu_kernel void @hello_world(float addrspace(1)* noalias %in1, float addrspace(1)* noalias %in2, float addrspace(1)* noalias %out) {
+define spir_kernel void @hello_world(float addrspace(1)* noalias %in1, float addrspace(1)* noalias %in2, float addrspace(1)* noalias %out) {
   %tid = call i32 @llvm.amdgcn.workitem.id.x() readnone
   %in1_ptr = getelementptr float, float addrspace(1)* %in1, i32 %tid
   %in2_ptr = getelementptr float, float addrspace(1)* %in2, i32 %tid
