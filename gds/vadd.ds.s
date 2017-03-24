@@ -98,10 +98,7 @@ hello_world:                            ; @hello_world
 	v_addc_u32_e32 v1, vcc, v1, v6, vcc
 	s_waitcnt vmcnt(0) lgkmcnt(0)
 	v_mov_b32 v4, 0
-	ds_write_b32 v4, v2 gds
-        s_waitcnt vmcnt(0) lgkmcnt(0)
-        ds_read_b32 v2, v4 gds
-        s_waitcnt vmcnt(0) lgkmcnt(0)
+	ds_write_b32 v4, v2
 	v_add_f32_e32 v2, v3, v2
 	flat_store_dword v[0:1], v2
 	s_endpgm
