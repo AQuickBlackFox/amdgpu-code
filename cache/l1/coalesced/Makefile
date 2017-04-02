@@ -12,5 +12,8 @@ host:
 	mkdir -p bin
 	hipcc -I../../../benchmarks l1_coalesced.cpp -o ./bin/l1_coalesced
 
+test:
+	cd ./bin; ./l1_coalesced; cd ..
+
 clean:
 	rm -rf ./bin dump*

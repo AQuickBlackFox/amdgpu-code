@@ -63,7 +63,7 @@ hello_world:                            ; @hello_world
 		kernarg_segment_byte_size = 16
 		workgroup_fbarrier_count = 0
 		wavefront_sgpr_count = 8
-		workitem_vgpr_count = 40
+		workitem_vgpr_count = 56
 		reserved_vgpr_first = 0
 		reserved_vgpr_count = 0
 		reserved_sgpr_first = 0
@@ -83,116 +83,119 @@ hello_world:                            ; @hello_world
 	s_waitcnt lgkmcnt(0)
 	v_ashrrev_i32_e32 v1, 31, v0
 	v_lshlrev_b64 v[0:1], 2, v[0:1]
-
-	s_mov_b32 s6, 0x200000
+	s_mov_b32 s6 0x200000
 
 	v_mov_b32_e32 v2, s0
 	v_mov_b32_e32 v3, s1
 
-	v_mul_u32_u24 v4, 0x10, v0
-	v_add_i32_e32 v5, vcc, v2, v4
-	v_addc_u32_e32 v6, vcc, 0, v3, vcc
+	v_add_i32_e32 v7, vcc, 0x0, v0						; tx + offset (offset = 256 DWORDs)
+	v_add_i32_e32 v8, vcc, v2, v7							; calculate LSB of address with offset
+	v_addc_u32_e32 v9, vcc, 0, v3, vcc				; calculate MSB of address with offset
 
-	v_add_i32_e32 v7, vcc, 0x1, v4
-	v_add_i32_e32 v7, vcc, v2, v7
-	v_addc_u32_e32 v8, vcc, 0, v3, vcc
+	v_add_i32_e32 v7, vcc, 0x400, v0
+	v_add_i32_e32 v10, vcc, v2, v7
+	v_addc_u32_e32 v11, vcc, 0, v3, vcc
 
-	v_add_i32_e32 v9, vcc, 0x2, v4
-	v_add_i32_e32 v9, vcc, v2, v9
-	v_addc_u32_e32 v10, vcc, 0, v3, vcc
+	v_add_i32_e32 v7, vcc, 0x800, v0
+	v_add_i32_e32 v12, vcc, v2, v7
+	v_addc_u32_e32 v13, vcc, 0, v3, vcc
 
-	v_add_i32_e32 v11, vcc, 0x3, v4
-	v_add_i32_e32 v11, vcc, v2, v11
-	v_addc_u32_e32 v12, vcc, 0, v3, vcc
-
-
-	v_add_i32_e32 v13, vcc, 0x4, v4
-	v_add_i32_e32 v13, vcc, v2, v13
-	v_addc_u32_e32 v14, vcc, 0, v3, vcc
-
-	v_add_i32_e32 v15, vcc, 0x5, v4
-	v_add_i32_e32 v15, vcc, v2, v15
-	v_addc_u32_e32 v16, vcc, 0, v3, vcc
-
-	v_add_i32_e32 v17, vcc, 0x6, v4
-	v_add_i32_e32 v17, vcc, v2, v17
-	v_addc_u32_e32 v18, vcc, 0, v3, vcc
-
-	v_add_i32_e32 v19, vcc, 0x7, v4
-	v_add_i32_e32 v19, vcc, v2, v19
-	v_addc_u32_e32 v20, vcc, 0, v3, vcc
+	v_add_i32_e32 v7, vcc, 0xC00, v0
+	v_add_i32_e32 v14, vcc, v2, v7
+	v_addc_u32_e32 v15, vcc, 0, v3, vcc
 
 
-	v_add_i32_e32 v21, vcc, 0x8, v4
-	v_add_i32_e32 v21, vcc, v2, v21
-	v_addc_u32_e32 v22, vcc, 0, v3, vcc
+	v_add_i32_e32 v7, vcc, 0x1000, v0					; tx + offset (offset = 256 DWORDs)
+	v_add_i32_e32 v16, vcc, v2, v7						; calculate LSB of address with offset
+	v_addc_u32_e32 v17, vcc, 0, v3, vcc				; calculate MSB of address with offset
 
-	v_add_i32_e32 v23, vcc, 0x9, v4
-	v_add_i32_e32 v23, vcc, v2, v23
-	v_addc_u32_e32 v24, vcc, 0, v3, vcc
+	v_add_i32_e32 v7, vcc, 0x1400, v0
+	v_add_i32_e32 v18, vcc, v2, v7
+	v_addc_u32_e32 v19, vcc, 0, v3, vcc
 
-	v_add_i32_e32 v25, vcc, 0xa, v4
-	v_add_i32_e32 v25, vcc, v2, v25
-	v_addc_u32_e32 v26, vcc, 0, v3, vcc
+	v_add_i32_e32 v7, vcc, 0x1800, v0
+	v_add_i32_e32 v20, vcc, v2, v7
+	v_addc_u32_e32 v21, vcc, 0, v3, vcc
 
-	v_add_i32_e32 v27, vcc, 0xb, v4
-	v_add_i32_e32 v27, vcc, v2, v27
-	v_addc_u32_e32 v28, vcc, 0, v3, vcc
+	v_add_i32_e32 v7, vcc, 0x1C00, v0
+	v_add_i32_e32 v22, vcc, v2, v7
+	v_addc_u32_e32 v23, vcc, 0, v3, vcc
 
 
-	v_add_i32_e32 v29, vcc, 0xc, v4
-	v_add_i32_e32 v29, vcc, v2, v29
-	v_addc_u32_e32 v30, vcc, 0, v3, vcc
+	v_add_i32_e32 v7, vcc, 0x2000, v0					; tx + offset (offset = 256 DWORDs)
+	v_add_i32_e32 v24, vcc, v2, v7						; calculate LSB of address with offset
+	v_addc_u32_e32 v25, vcc, 0, v3, vcc				; calculate MSB of address with offset
 
-	v_add_i32_e32 v31, vcc, 0xd, v4
-	v_add_i32_e32 v31, vcc, v2, v31
-	v_addc_u32_e32 v32, vcc, 0, v3, vcc
+	v_add_i32_e32 v7, vcc, 0x2400, v0
+	v_add_i32_e32 v26, vcc, v2, v7
+	v_addc_u32_e32 v27, vcc, 0, v3, vcc
 
-	v_add_i32_e32 v33, vcc, 0xe, v4
-	v_add_i32_e32 v33, vcc, v2, v33
-	v_addc_u32_e32 v34, vcc, 0, v3, vcc
+	v_add_i32_e32 v7, vcc, 0x2800, v0
+	v_add_i32_e32 v28, vcc, v2, v7
+	v_addc_u32_e32 v29, vcc, 0, v3, vcc
 
-	v_add_i32_e32 v35, vcc, 0xf, v4
-	v_add_i32_e32 v35, vcc, v2, v35
-	v_addc_u32_e32 v36, vcc, 0, v3, vcc
+	v_add_i32_e32 v7, vcc, 0x2C00, v0
+	v_add_i32_e32 v30, vcc, v2, v7
+	v_addc_u32_e32 v31, vcc, 0, v3, vcc
+
+
+	v_add_i32_e32 v7, vcc, 0x3000, v0					; tx + offset (offset = 256 DWORDs)
+	v_add_i32_e32 v32, vcc, v2, v7						; calculate LSB of address with offset
+	v_addc_u32_e32 v33, vcc, 0, v3, vcc				; calculate MSB of address with offset
+
+	v_add_i32_e32 v7, vcc, 0x3400, v0
+	v_add_i32_e32 v34, vcc, v2, v7
+	v_addc_u32_e32 v35, vcc, 0, v3, vcc
+
+	v_add_i32_e32 v7, vcc, 0x3800, v0
+	v_add_i32_e32 v36, vcc, v2, v7
+	v_addc_u32_e32 v37, vcc, 0, v3, vcc
+
+
+	v_add_i32_e32 v7, vcc, 0x3C00, v0
+	v_add_i32_e32 v38, vcc, v2, v7
+	v_addc_u32_e32 v39, vcc, 0, v3, vcc
+
 
 BB0_1:
 
-	flat_load_dword v35, v[5:6]
+	flat_load_dword v40, v[8:9]			; load from the address
 
-	flat_load_dword v36, v[7:8]
+	flat_load_dword v41, v[10:11]
 
-	flat_load_dword v37, v[9:10]
+	flat_load_dword v42, v[12:13]
 
-	flat_load_dword v38, v[11:12]
-
-
-	flat_load_dword v39, v[13:14]
-
-	flat_load_dword v40, v[15:16]
-
-	flat_load_dword v41, v[17:18]
-
-	flat_load_dword v42, v[19:20]
+	flat_load_dword v43, v[14:15]
 
 
-	flat_load_dword v43, v[21:22]
 
-	flat_load_dword v44, v[23:24]
+	flat_load_dword v44, v[16:17]		; load from the address
 
-	flat_load_dword v45, v[25:26]
+	flat_load_dword v45, v[18:19]
 
-	flat_load_dword v46, v[27:28]
+	flat_load_dword v46, v[20:21]
+
+	flat_load_dword v47, v[22:23]
 
 
-	flat_load_dword v47, v[29:30]
 
-	flat_load_dword v48, v[31:32]
+	flat_load_dword v48, v[24:25]		; load from the address
 
-	flat_load_dword v49, v[33:34]
+	flat_load_dword v49, v[26:27]
 
-	flat_load_dword v50, v[35:36]
+	flat_load_dword v50, v[28:29]
 
+	flat_load_dword v51, v[30:31]
+
+
+
+	flat_load_dword v52, v[32:33]		; load from the address
+
+	flat_load_dword v53, v[34:35]
+
+	flat_load_dword v54, v[36:37]
+
+	flat_load_dword v55, v[38:39]
 
 	s_add_i32 s6, s6, -1
 	s_cmp_lg_u32 s6, 0
@@ -203,7 +206,6 @@ BB0_1:
 	v_add_i32_e32 v4, vcc, v2, v0
 	v_addc_u32_e32 v5, vcc, 0, v3, vcc
 	flat_store_dword v[4:5], v6
-
 	s_endpgm
 .Lfunc_end0:
 	.size	hello_world, .Lfunc_end0-hello_world
