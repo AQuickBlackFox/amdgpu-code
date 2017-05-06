@@ -10,7 +10,7 @@ assemble:
 
 host:
 	mkdir -p bin
-	hipcc -I../../benchmarks l2.cpp -o ./bin/l2
+	hipcc -DNUM_CU=36 -I../../benchmarks l2.cpp -o ./bin/l2
 
 test:
 	cd ./bin; ./l2; cd ..

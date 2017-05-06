@@ -8,7 +8,7 @@
 #define Y 64
 #define LEN X*Y
 #define WI 256
-#define WG 1
+#define WG NUM_CU
 #define SIZE LEN<<2
 #define ITER 0x200000
 

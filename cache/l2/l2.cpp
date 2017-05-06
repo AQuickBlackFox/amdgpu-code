@@ -8,7 +8,7 @@
 #define Y 16
 #define LEN X*Y
 #define WI 256
-#define WG 1
+#define WG NUM_CU
 #define SIZE LEN<<2
 #define ITER 0x200000
 
@@ -62,7 +62,7 @@ int main() {
   dt = dtime_usec(dt);
 
   unsigned long long ops = ITER;
-  ops *= X;
+  ops *= X*WG;
   ops *= Y;
   ops *= 4;
   float et = dt/(float)USECPSEC;
