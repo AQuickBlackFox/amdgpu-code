@@ -1,12 +1,6 @@
 	.text
 	.hsa_code_object_version 2,1
 	.hsa_code_object_isa 8,0,3,"AMD","AMDGPU"
-	.amdgpu_runtime_metadata
----
-{ amd.MDVersion: [ 2, 1 ], amd.IsaInfo: { amd.IsaInfoWavefrontSize: 64, amd.IsaInfoLocalMemorySize: 65536, amd.IsaInfoEUsPerCU: 4, amd.IsaInfoMaxWavesPerEU: 10, amd.IsaInfoMaxFlatWorkGroupSize: 2048, amd.IsaInfoSGPRAllocGranule: 16, amd.IsaInfoTotalNumSGPRs: 800, amd.IsaInfoAddressableNumSGPRs: 102, amd.IsaInfoVGPRAllocGranule: 4, amd.IsaInfoTotalNumVGPRs: 256, amd.IsaInfoAddressableNumVGPRs: 256 } }
-...
-
-	.end_amdgpu_runtime_metadata
 	.globl	hello_world
 	.p2align	8
 	.type	hello_world,@function
