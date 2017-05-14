@@ -73,8 +73,15 @@ sdwa_bitcast.device:
 	$(CLANG) -x assembler -target $(TARGET) -mcpu=$(CPU) -c -o sdwa_bitcast.o sdwa_bitcast.s
 	$(CLANG) -target $(TARGET) sdwa_bitcast.o -o sdwa_bitcast.co
 
+sdwa_short.device:
+	cp sdwa_mac_f16.txt sdwa_mac_f16.s
+	$(CLANG) -x assembler -target $(TARGET) -mcpu=$(CPU) -c -o sdwa_mac_f16.o sdwa_mac_f16.s
+	$(CLANG) -target $(TARGET) sdwa_mac_f16.o -o smacf16.co
+
+sdwa_short.host:
+	$(HIPCC) sdwa_mac_f16.cpp -o sdwa_mac_f16
 
 
 
 clean:
-	rm -r -f *.o *.co *.s sdwa_mul sdwa_comp sdwa_dp4 sdwa_sdp4 sdwa_mulpk sdwa_half sdwa_half2
+	rm -r -f *.o *.co *.s sdwa_mul sdwa_comp sdwa_dp4 sdwa_sdp4 sdwa_mulpk sdwa_half sdwa_half2 sdwa_mac_f16
