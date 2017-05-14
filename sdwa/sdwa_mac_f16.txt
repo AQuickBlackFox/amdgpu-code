@@ -200,14 +200,14 @@ hello_world:                            ; @hello_world
         flat_load_dword v4, v[0:1]
         s_waitcnt vmcnt(0) lgkmcnt(0)
         ;;#ASMSTART
-;       v_mac_f16 v4, v2, v3
+        ;v_mac_f16 v4, v2, v3
         ;;#ASMEND
-;       flat_store_dword v[0:1], v4
+        ;flat_store_dword v[0:1], v4
         v_mov_b32 v6, v0
-        v_mov_b32 v7, v1
-        v_mov_b32 v0, v4
-        v_mov_b32 v1, v2
-        v_mov_b32 v2, v3
+        v_mov_b32 v7, v1 ; move v[0:1] to v[6:7] which is store location of C
+        v_mov_b32 v0, v4 ; move c to v0 as the encoding is for dst = v0
+        v_mov_b32 v1, v2 ; move a to v1 as the encoding is for src = v1
+        v_mov_b32 v2, v3 ; move b to v2 as the encoding is for src = v3
         .quad 024050520050600002371
         flat_store_dword v[6:7], v0
 
