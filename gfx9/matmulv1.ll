@@ -15,7 +15,6 @@ define <4 x half> @__hdp2x2a(<4 x half> %a, <4 x half> %b, <4 x half> %c)
     %11 = extractelement <4 x half> %c, i32 2 ; c.z
     %12 = extractelement <4 x half> %c, i32 3 ; c.w
 
-;       tail call void asm sideeffect "v_pk_mad_f16 $0, $1, $2, $3","v,v,v,v"(<4 x half> %c, <4 x half> %a, <4 x half> %b, <4 x half> %c)
     %13 = fmul half %1, %5  ; a.x * b.x
     %14 = fadd half %13, %9 ; c.x = a.x * b.x + c.x
 
