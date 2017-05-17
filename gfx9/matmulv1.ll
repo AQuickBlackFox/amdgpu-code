@@ -27,7 +27,6 @@ define <4 x half> @__hdp2x2a(<4 x half> %a, <4 x half> %b, <4 x half> %c)
     %19 = fmul half %3, %6 ; a.z * b.y
     %20 = fadd half %19, %12; c.w = a.z * b.y + c.w
 
-
     %21 = fmul half %2, %7 ; a.y * b.z
     %22 = fadd half %21, %14; c.x = a.y * b.z + c.x
 
