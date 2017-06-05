@@ -3,15 +3,15 @@
 #include<hip/hip_runtime_api.h>
 #include<hip/hip_fp16.h>
 
-#define FH_TILE_X_16 16
-#define FH_TILE_Y_16 16
-#define FH_TILE_X_32 32
-#define FH_TILE_Y_32 32
+#define FH_WI_X 16
+#define FH_WI_Y 16
+#define FH_TILE_X 16
+#define FH_TILE_Y 32
 
-#define W_HEIGHT 64
-#define W_WIDTH  64
+#define W_HEIGHT 1024
+#define W_WIDTH  1024
 #define X_HEIGHT W_WIDTH
-#define X_WIDTH  64
+#define X_WIDTH  1024
 #define Y_HEIGHT W_HEIGHT
 #define Y_WIDTH X_WIDTH
 
@@ -28,24 +28,30 @@ __global__ void Dotv1(T* Y, T* W, T* X)
     int bx = hipBlockIdx_x;
     int by = hipBlockIdx_y;
 
-    int row = ty + by * 16;
-    int col = tx + bx * 16;
+    int ty0 = 2 * ty;
+    int ty1 = 2 * ty + 1;
+
+    int row0 = ty0 + by * FH_TILE_Y;
+    int row1 = ty1 + by * FH_TILE_Y;
+    int col = tx + bx * FH_TILE_X;
 
     __half2 *_W = (__half2*)W;
     __half2 *_X = (__half2*)X;
     __half2 *_Y = (__half2*)Y;
-    __shared__ __half2 sW[32][16];
-    __shared__ __half2 sX[32][16];
+    __shared__ __half2 sW[FH_TILE_Y][FH_TILE_X];
+    __shared__ __half2 sX[FH_TILE_Y][FH_TILE_X];
     __half2 c0 = {0.0, 0.0};
     __half2 c1 = {0.0, 0.0};
-    for (int j = 0; j < w_width / 32; j++) {
-        sW[ty][tx] = _W[row*(32) + (j*16 + tx)];
-        sX[ty][tx] = _X[col + (j*16+ty)*32];
+    for (int j = 0; j < w_width / FH_TILE_Y; j++) {
+        sW[ty0][tx] = _W[row0 * (w_width/2) + (j*FH_WI_X+tx)];
+        sW[ty1][tx] = _W[row1 * (w_width/2) + (j*FH_WI_X+tx)];
+        sX[ty0][tx] = _X[col + (j * FH_WI_Y + ty0) * (x_width/2)];
+        sX[ty1][tx] = _X[col + (j * FH_WI_Y + ty1) * (x_width/2)];
         __syncthreads();
 
-        for (int i = 0; i < FH_TILE_Y_16; i++) {
-            __half2 a0 = sW[2*ty][i];
-            __half2 a1 = sW[2*ty+1][i];
+        for (int i = 0; i < 16; i++) {
+            __half2 a0 = sW[ty0][i];
+            __half2 a1 = sW[ty1][i];
             __half2 b0 = sX[2*i][tx];
             __half2 b1 = sX[2*i+1][tx];
             c0.x = c0.x + a0.x * b0.x + a0.y * b1.x;
@@ -55,7 +61,8 @@ __global__ void Dotv1(T* Y, T* W, T* X)
         }
         __syncthreads();
 
-        _Y[row*16+col] = c0;
+        _Y[row0*FH_WI_Y+col] = c0;
+        _Y[row1*FH_WI_Y+col] = c1;
     }
 }
 
@@ -93,7 +100,7 @@ int main()
     hipDeviceSynchronize();
     hipMemcpy(Yh, Yd, Y_SIZE, hipMemcpyDeviceToHost);
 
-    for(int i=0;i<Y_WIDTH;i++){
+    for(int i=0;i<16;i++){
         std::cout<<float(Yh[i])<<std::endl;
     }
 }
