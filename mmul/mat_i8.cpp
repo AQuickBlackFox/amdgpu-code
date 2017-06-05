@@ -32,11 +32,16 @@ __global__ void Dotv1(T* Y, T* W, T* X)
     int bx = hipBlockIdx_x;
     int by = hipBlockIdx_y;
 
-    int ty0 = 2 * ty;
-    int ty1 = 2 * ty + 1;
+    int ty0 = 4 * ty;
+    int ty1 = 4 * ty + 1;
+    int ty2 = 4 * ty + 2;
+    int ty3 = 4 * ty + 3;
 
     int row0 = ty0 + by * FH_TILE_Y;
     int row1 = ty1 + by * FH_TILE_Y;
+    int row2 = ty2 + by * FH_TILE_Y;
+    int row3 = ty3 + by * FH_TILE_Y;
+
     int col = tx + bx * FH_TILE_X;
 
     uint8_t *_W = (uint8_t*)W;
@@ -49,15 +54,27 @@ __global__ void Dotv1(T* Y, T* W, T* X)
     uint8x4_t c2 = {0, 0, 0, 0};
     uint8x4_t c3 = {0, 0, 0, 0};
     for (int j = 0; j < w_width / FH_TILE_Y; j++) {
-        sW[ty0][tx] = _W[row0 * (w_width/2) + (j*FH_WI_X+tx)];
-        sW[ty1][tx] = _W[row1 * (w_width/2) + (j*FH_WI_X+tx)];
-        sX[ty0][tx] = _X[col + (j * FH_WI_Y + ty0) * (x_width/2)];
-        sX[ty1][tx] = _X[col + (j * FH_WI_Y + ty1) * (x_width/2)];
+        sW[ty0][tx] = _W[row0 * (w_width/4) + (j*FH_WI_X+tx)];
+        sW[ty1][tx] = _W[row1 * (w_width/4) + (j*FH_WI_X+tx)];
+        sW[ty2][tx] = _W[row2 * (w_width/4) + (j*FH_WI_X+tx)];
+        sW[ty3][tx] = _W[row3 * (w_width/4) + (j*FH_WI_X+tx)];
+
+        sX[ty0][tx] = _X[col + (j * FH_WI_Y + ty0) * (x_width/4)];
+        sX[ty1][tx] = _X[col + (j * FH_WI_Y + ty1) * (x_width/4)];
+        sX[ty2][tx] = _X[col + (j * FH_WI_Y + ty2) * (x_width/4)];
+        sX[ty3][tx] = _X[col + (j * FH_WI_Y + ty3) * (x_width/4)];
+
         __syncthreads();
 
         for (int i = 0; i < 16; i++) {
+            int i0 = 4 * i;
+            int i1 = 4 * i + 1;
+            int i2 = 4 * i + 2;
+
             uint8_t a0 = sW[ty0][i];
             uint8_t a1 = sW[ty1][i];
+            uint8_t a2 = sW[ty2][i];
+            uint8_t a3 = sW[ty3][i];
             uint8_t b0 = sX[2*i][tx];
             uint8_t b1 = sX[2*i+1][tx];
             c0.x = c0.x + a0.x * b0.x + a0.y * b1.x;
