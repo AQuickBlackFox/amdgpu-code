@@ -49,7 +49,7 @@ __global__ void Dotv1(T* Y, T* W, T* X)
         sX[ty1][tx] = _X[col + (j * FH_WI_Y + ty1) * (x_width/2)];
         __syncthreads();
 
-        for (int i = 0; i < 16; i++) {
+        for (int i = 0; i < FH_TILE_X; i++) {
             __half2 a0 = sW[ty0][i];
             __half2 a1 = sW[ty1][i];
             __half2 b0 = sX[2*i][tx];
@@ -61,8 +61,8 @@ __global__ void Dotv1(T* Y, T* W, T* X)
         }
         __syncthreads();
 
-        _Y[row0*FH_WI_Y+col] = c0;
-        _Y[row1*FH_WI_Y+col] = c1;
+        _Y[row0*FH_WI_X+col] = c0;
+        _Y[row1*FH_WI_X+col] = c1;
     }
 }
 
