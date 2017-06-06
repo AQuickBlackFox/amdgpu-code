@@ -15,12 +15,12 @@
 #define Y_HEIGHT W_HEIGHT
 #define Y_WIDTH X_WIDTH
 
-#define W_SIZE W_HEIGHT * W_WIDTH * sizeof(int8_t)
-#define X_SIZE X_HEIGHT * X_WIDTH * sizeof(int8_t)
-#define Y_SIZE Y_HEIGHT * Y_WIDTH * sizeof(int8_t)
+#define W_SIZE W_HEIGHT * W_WIDTH * sizeof(char)
+#define X_SIZE X_HEIGHT * X_WIDTH * sizeof(char)
+#define Y_SIZE Y_HEIGHT * Y_WIDTH * sizeof(char)
 
 typedef struct {
-int8_t x, y, z, w;
+char x, y, z, w;
 } int8x4_t;
 
 template<typename T, int w_height, int w_width, int x_height, int x_width>
@@ -117,12 +117,12 @@ __global__ void Dotv1(T* Y, T* W, T* X)
 
 int main()
 {
-    int8_t *Wh, *Xh, *Yh;
-    int8_t *Wd, *Xd, *Yd;
+    char *Wh, *Xh, *Yh;
+    char *Wd, *Xd, *Yd;
 
-    Wh = (int8_t*)malloc(W_SIZE);
-    Xh = (int8_t*)malloc(X_SIZE);
-    Yh = (int8_t*)malloc(Y_SIZE);
+    Wh = (char*)malloc(W_SIZE);
+    Xh = (char*)malloc(X_SIZE);
+    Yh = (char*)malloc(Y_SIZE);
 
     for(int i=0;i<W_HEIGHT*W_WIDTH;i++){
         Wh[i] = 1;
@@ -144,11 +144,11 @@ int main()
 
     dim3 dimBlock(16, 16);
     dim3 dimGrid(X_WIDTH/dimBlock.x/4, W_HEIGHT/dimBlock.y/4);
-    hipLaunchKernelGGL((Dotv1<int8_t, W_HEIGHT, W_WIDTH, X_HEIGHT, X_WIDTH>), dimGrid, dimBlock, 0, 0, Yd, Wd, Xd);
+    hipLaunchKernelGGL((Dotv1<char, W_HEIGHT, W_WIDTH, X_HEIGHT, X_WIDTH>), dimGrid, dimBlock, 0, 0, Yd, Wd, Xd);
     hipDeviceSynchronize();
     hipMemcpy(Yh, Yd, Y_SIZE, hipMemcpyDeviceToHost);
 
     for(int i=0;i<16;i++){
-        std::cout<<std::hex<<int8_t(Yh[i])<<std::endl;
+        std::cout<<signed(Yh[i])<<std::endl;
     }
 }
