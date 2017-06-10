@@ -2,16 +2,17 @@
 #include<hip/hip_runtime.h>
 #include<hip/hip_runtime_api.h>
 #include<hip/hip_fp16.h>
+#include<sys/time.h>
 
 #define FH_WI_X 16
 #define FH_WI_Y 16
 #define FH_TILE_X 16
 #define FH_TILE_Y 32
 
-#define W_HEIGHT 8192
-#define W_WIDTH  8192
+#define W_HEIGHT WIDTH
+#define W_WIDTH  WIDTH
 #define X_HEIGHT W_WIDTH
-#define X_WIDTH  8192
+#define X_WIDTH  WIDTH
 #define Y_HEIGHT W_HEIGHT
 #define Y_WIDTH X_WIDTH
 
@@ -22,6 +23,15 @@
 typedef __half2 half2;
 
 extern __attribute__((const)) half2 __hc_fma_v2f16(half2, half2, half2) __asm("llvm.fma.v2f16");
+
+#define USECPSEC 1000000ULL
+
+unsigned long long dtime_usec(unsigned long long start){
+  timeval tv;
+  gettimeofday(&tv, 0);
+  return ((tv.tv_sec*USECPSEC)+tv.tv_usec)-start;
+}
+
 
 template<typename T, size_t w_height, size_t w_width, size_t x_height, size_t x_width>
 __global__ void Dotv1(T* Y, T* W, T* X)
@@ -108,8 +118,21 @@ int main()
 
     dim3 dimBlock(16, 16);
     dim3 dimGrid((X_WIDTH/dimBlock.x)/2, (W_HEIGHT/dimBlock.y)/2);
+
+    unsigned long long dt = dtime_usec(0);
+
     hipLaunchKernelGGL((Dotv1<half, W_HEIGHT, W_WIDTH, X_HEIGHT, X_WIDTH>), dimGrid, dimBlock, 0, 0, Yd, Wd, Xd);
     hipDeviceSynchronize();
+
+    dt = dtime_usec(dt);
+
+    unsigned long long ops = X_HEIGHT * W_WIDTH * X_WIDTH;
+    unsigned long long Mops = ops / 1000000;
+    float et = dt/(float)USECPSEC;
+    float tp = (Mops*2)/(et*1000000);
+    std::cout<<"Tp: "<<tp<<" Time: "<<et<<std::endl;
+
+
     hipMemcpy(Yh, Yd, Y_SIZE, hipMemcpyDeviceToHost);
 
     for(int i=0;i<16;i++){

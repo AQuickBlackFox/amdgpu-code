@@ -2,25 +2,34 @@
 #include<hip/hip_runtime.h>
 #include<hip/hip_runtime_api.h>
 #include<hip/hip_fp16.h>
+#include<sys/time.h>
 
 #define FH_WI_X 16
 #define FH_WI_Y 16
 #define FH_TILE_X 16
 #define FH_TILE_Y 16
 
-#define W_HEIGHT 8192
-#define W_WIDTH  8192
+#define W_HEIGHT WIDTH
+#define W_WIDTH  WIDTH
 #define X_HEIGHT W_WIDTH
-#define X_WIDTH  8192
+#define X_WIDTH  WIDTH
 #define Y_HEIGHT W_HEIGHT
 #define Y_WIDTH X_WIDTH
 
 #define W_SIZE W_HEIGHT * W_WIDTH * sizeof(half)
 #define X_SIZE X_HEIGHT * X_WIDTH * sizeof(half)
-#define Y_SIZE Y_HEIGHT * Y_WIDTH * sizeof(half)
+#define Y_SIZE Y_HEIGHT * Y_WIDTH * sizeof(float)
 
-template<typename T, int w_height, int w_width, int x_height, int x_width>
-__global__ void Dotv1(T* Y, T* W, T* X)
+#define USECPSEC 1000000ULL
+
+unsigned long long dtime_usec(unsigned long long start){
+  timeval tv;
+  gettimeofday(&tv, 0);
+  return ((tv.tv_sec*USECPSEC)+tv.tv_usec)-start;
+}
+
+template<typename T, typename U, int w_height, int w_width, int x_height, int x_width>
+__global__ void Dotv1(U* Y, T* W, T* X)
 {
     int tx = hipThreadIdx_x;
     int ty = hipThreadIdx_y;
@@ -33,16 +42,16 @@ __global__ void Dotv1(T* Y, T* W, T* X)
 
     __shared__ half sW[FH_TILE_Y][FH_TILE_X];
     __shared__ half sX[FH_TILE_Y][FH_TILE_X];
-    half c = 0.0;
+    U c = 0.0;
     for (int j = 0; j < w_width / FH_TILE_Y; j++) {
         sW[ty][tx] = W[row * w_width + (j*FH_WI_X+tx)];
         sX[ty][tx] = X[col + (j * FH_WI_Y + ty) * x_width];
         __syncthreads();
 
         for (int i = 0; i < FH_TILE_X; i++) {
-            half a = sW[ty][i];
-            half b = sX[i][tx];
-            c = c + a * b;
+            T a = sW[ty][i];
+            T b = sX[i][tx];
+            c = c + U(a * b);
         }
         __syncthreads();
 
@@ -53,12 +62,12 @@ __global__ void Dotv1(T* Y, T* W, T* X)
 
 int main()
 {
-    half *Wh, *Xh, *Yh;
-    half *Wd, *Xd, *Yd;
+    half *Wh, *Xh, *Wd, *Xd;
+    float *Yh, *Yd;
 
     Wh = (half*)malloc(W_SIZE);
     Xh = (half*)malloc(X_SIZE);
-    Yh = (half*)malloc(Y_SIZE);
+    Yh = (float*)malloc(Y_SIZE);
 
     for(int i=0;i<W_HEIGHT*W_WIDTH;i++){
         Wh[i] = 0.1;
@@ -80,8 +89,16 @@ int main()
 
     dim3 dimBlock(16, 16);
     dim3 dimGrid(X_WIDTH/dimBlock.x, W_HEIGHT/dimBlock.y);
-    hipLaunchKernelGGL((Dotv1<half, W_HEIGHT, W_WIDTH, X_HEIGHT, X_WIDTH>), dimGrid, dimBlock, 0, 0, Yd, Wd, Xd);
+    unsigned long long dt = dtime_usec(0);
+    hipLaunchKernelGGL((Dotv1<half, float, W_HEIGHT, W_WIDTH, X_HEIGHT, X_WIDTH>), dimGrid, dimBlock, 0, 0, Yd, Wd, Xd);
     hipDeviceSynchronize();
+    dt = dtime_usec(dt);
+
+    unsigned long long ops = X_HEIGHT * W_WIDTH * X_WIDTH;
+    unsigned long long Mops = ops / 1000000;
+    float et = dt/(float)USECPSEC;
+    float tp = (Mops*2)/(et*1000000);
+    std::cout<<"Tp: "<<tp<<" Time: "<<et<<std::endl;
     hipMemcpy(Yh, Yd, Y_SIZE, hipMemcpyDeviceToHost);
 
     for(int i=0;i<16;i++){
