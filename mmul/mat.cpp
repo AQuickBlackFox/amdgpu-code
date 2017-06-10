@@ -2,6 +2,7 @@
 #include<hip/hip_runtime.h>
 #include<hip/hip_runtime_api.h>
 #include<hip/hip_fp16.h>
+#include<sys/time.h>
 
 #define FH_WI_X 16
 #define FH_WI_Y 16
@@ -18,6 +19,14 @@
 #define W_SIZE W_HEIGHT * W_WIDTH * sizeof(float)
 #define X_SIZE X_HEIGHT * X_WIDTH * sizeof(float)
 #define Y_SIZE Y_HEIGHT * Y_WIDTH * sizeof(float)
+
+#define USECPSEC 1000000ULL
+
+unsigned long long dtime_usec(unsigned long long start){
+  timeval tv;
+  gettimeofday(&tv, 0);
+  return ((tv.tv_sec*USECPSEC)+tv.tv_usec)-start;
+}
 
 template<typename T, int w_height, int w_width, int x_height, int x_width>
 __global__ void Dotv1(T* Y, T* W, T* X)
@@ -80,11 +89,18 @@ int main()
 
     dim3 dimBlock(16, 16);
     dim3 dimGrid(X_WIDTH/dimBlock.x, W_HEIGHT/dimBlock.y);
+    unsigned long long dt = dtime_usec(0);
     hipLaunchKernelGGL((Dotv1<float, W_HEIGHT, W_WIDTH, X_HEIGHT, X_WIDTH>), dimGrid, dimBlock, 0, 0, Yd, Wd, Xd);
     hipDeviceSynchronize();
+
+    dt = dtime_usec(dt);
+
+    unsigned long long ops = X_HEIGHT * W_WIDTH * X_WIDTH;
+    unsigned long long Mops = ops / 1000000;
+    float et = dt/(float)USECPSEC;
+    float tp = (Mops*2)/(et*1000000);
+    std::cout<<"Tp: "<<tp<<" Time: "<<et<<std::endl;
+
     hipMemcpy(Yh, Yd, Y_SIZE, hipMemcpyDeviceToHost);
 
-    for(int i=0;i<16;i++){
-        std::cout<<float(Yh[i])<<std::endl;
-    }
 }

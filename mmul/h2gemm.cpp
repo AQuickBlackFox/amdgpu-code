@@ -18,7 +18,7 @@
 
 #define W_SIZE W_HEIGHT * W_WIDTH * sizeof(half)
 #define X_SIZE X_HEIGHT * X_WIDTH * sizeof(half)
-#define Y_SIZE Y_HEIGHT * Y_WIDTH * sizeof(half)
+#define Y_SIZE Y_HEIGHT * Y_WIDTH * sizeof(float)
 
 typedef __half2 half2;
 
@@ -33,8 +33,8 @@ unsigned long long dtime_usec(unsigned long long start){
 }
 
 
-template<typename T, size_t w_height, size_t w_width, size_t x_height, size_t x_width>
-__global__ void Dotv1(T* Y, T* W, T* X)
+template<typename T, typename U, size_t w_height, size_t w_width, size_t x_height, size_t x_width>
+__global__ void Dotv1(U* Y, T* W, T* X)
 {
     int tx = hipThreadIdx_x;
     int ty = hipThreadIdx_y;
@@ -44,9 +44,13 @@ __global__ void Dotv1(T* Y, T* W, T* X)
 
     int ty0 = 2 * ty;
     int ty1 = 2 * ty + 1;
+    int ty2 = 2 * ty + 2;
+    int ty3 = 2 * ty + 3;
 
     int row0 = ty0 + by * FH_TILE_Y;
     int row1 = ty1 + by * FH_TILE_Y;
+    int row2 = ty2 + by * FH_TILE_Y;
+    int row3 = ty3 + by * FH_TILE_Y;
     int col = tx + bx * FH_TILE_X;
 
     __half2 *_W = (__half2*)W;
@@ -54,8 +58,7 @@ __global__ void Dotv1(T* Y, T* W, T* X)
     __half2 *_Y = (__half2*)Y;
     __shared__ __half2 sW[FH_TILE_Y][FH_TILE_X];
     __shared__ __half2 sX[FH_TILE_Y][FH_TILE_X];
-    __half2 c0 = {0.0, 0.0};
-    __half2 c1 = {0.0, 0.0};
+    U c0 = 0.0, c1 = 0.0, c2 = 0.0, c3 = 0.0;
     for (int j = 0; j < w_width / FH_TILE_Y; j++) {
         sW[ty0][tx] = _W[row0 * (w_width/2) + (j*FH_WI_X+tx)];
         sW[ty1][tx] = _W[row1 * (w_width/2) + (j*FH_WI_X+tx)];
@@ -75,28 +78,30 @@ __global__ void Dotv1(T* Y, T* W, T* X)
             c1 = __hc_fma_v2f16(b1, (half2)a1.y, __hc_fma_v2f16(b0, (half2)a1.x, c1));
 
 #else
-            c0.x = c0.x + a0.x * b0.x + a0.y * b1.x;
-            c0.y = c0.y + a0.x * b0.y + a0.y * b1.y;
-            c1.x = c1.x + a1.x * b0.x + a1.y * b1.x;
-            c1.y = c1.y + a1.x * b0.y + a1.y * b1.y;
+            c0 = c0 + a0.x * b0.x + a0.y * b1.x;
+            c1 = c1 + a0.x * b0.y + a0.y * b1.y;
+            c2 = c2 + a1.x * b0.x + a1.y * b1.x;
+            c3 = c3 + a1.x * b0.y + a1.y * b1.y;
 #endif
         }
         __syncthreads();
 
         _Y[row0*FH_WI_X+col] = c0;
         _Y[row1*FH_WI_X+col] = c1;
+        _Y[row2*FH_WI_X+col] = c2;
+        _Y[row3*FH_WI_X+col] = c3;
     }
 }
 
 
 int main()
 {
-    half *Wh, *Xh, *Yh;
-    half *Wd, *Xd, *Yd;
+    half *Wh, *Xh, *Wd, *Xd;
+    float *Yh, *Yd;
 
     Wh = (half*)malloc(W_SIZE);
     Xh = (half*)malloc(X_SIZE);
-    Yh = (half*)malloc(Y_SIZE);
+    Yh = (float*)malloc(Y_SIZE);
 
     for(size_t i=0;i<W_HEIGHT*W_WIDTH;i++){
         Wh[i] = 0.1;
@@ -121,7 +126,7 @@ int main()
 
     unsigned long long dt = dtime_usec(0);
 
-    hipLaunchKernelGGL((Dotv1<half, W_HEIGHT, W_WIDTH, X_HEIGHT, X_WIDTH>), dimGrid, dimBlock, 0, 0, Yd, Wd, Xd);
+    hipLaunchKernelGGL((Dotv1<half, float, W_HEIGHT, W_WIDTH, X_HEIGHT, X_WIDTH>), dimGrid, dimBlock, 0, 0, Yd, Wd, Xd);
     hipDeviceSynchronize();
 
     dt = dtime_usec(dt);
@@ -135,7 +140,4 @@ int main()
 
     hipMemcpy(Yh, Yd, Y_SIZE, hipMemcpyDeviceToHost);
 
-    for(int i=0;i<16;i++){
-        std::cout<<float(Yh[i])<<std::endl;
-    }
 }

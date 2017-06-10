@@ -101,7 +101,4 @@ int main()
     std::cout<<"Tp: "<<tp<<" Time: "<<et<<std::endl;
     hipMemcpy(Yh, Yd, Y_SIZE, hipMemcpyDeviceToHost);
 
-    for(int i=0;i<16;i++){
-        std::cout<<float(Yh[i])<<std::endl;
-    }
 }
