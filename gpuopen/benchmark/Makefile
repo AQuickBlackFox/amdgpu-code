@@ -1,7 +1,9 @@
 HIPCC=$(HIP_PATH)/bin/hipcc
-LLVM_PATH=~/rocm/llvm
-LLC=$(LLVM_PATH)/bin/llc
-CLANG=$(LLVM_PATH)/bin/clang
+#LLVM_PATH=~/rocm/llvm
+#LLC=$(LLVM_PATH)/bin/llc
+LLC=llc
+#CLANG=$(LLVM_PATH)/bin/clang
+CLANG=clang
 TARGET=amdgcn--amdhsa
 CPU=fiji
 
@@ -258,8 +260,15 @@ hfma2.5.host:
 	$(HIPCC) hfma2.5.cpp -o hfma2.5
 
 
+hfma2.6.device:
+	$(LLC) -mtriple $(TARGET) -march=amdgcn -mcpu=$(CPU) hfma2.6.ll
+	$(CLANG) -x assembler -target $(TARGET) -mcpu=$(CPU) -c -o hfma2.6.o hfma2.6.s
+	$(CLANG) -target $(TARGET) hfma2.6.o -o hfma2.6.co
+
+hfma2.6.host:
+	$(HIPCC) hfma2.6.cpp -o hfma2.6
 
 
 
 clean:
-	rm -r -f *.co *.o *.s fadd.2 fmul.2 ffma.2 ffma.3 hadd.1 hadd.2 hadd.3 hmul.1 hmul.2 hmul.3 ffma.1 hfma.1 hfma.2 hadd2.1 hadd2.2 hadd2.3 hmul2.1 hmul2.2 hmul2.3 hfma2.1 hfma2.2 hfma2.3 hfma2.4 dump* a.out fmac.1 fmac.2
+	rm -r -f *.co *.o *.s fadd.2 fmul.2 ffma.2 ffma.3 hadd.1 hadd.2 hadd.3 hmul.1 hmul.2 hmul.3 ffma.1 hfma.1 hfma.2 hadd2.1 hadd2.2 hadd2.3 hmul2.1 hmul2.2 hmul2.3 hfma2.1 hfma2.2 hfma2.3 hfma2.4 dump* a.out fmac.1 fmac.2 hfma2.6
