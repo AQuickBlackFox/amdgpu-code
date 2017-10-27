@@ -1,7 +1,6 @@
 HIPCC=$(HIP_PATH)/bin/hipcc
-LLVM_PATH=~/rocm/llvm.rocm
-LLC=$(LLVM_PATH)/bin/llc
-CLANG=$(LLVM_PATH)/bin/clang
+LLC=llc
+CLANG=clang
 TARGET=amdgcn--amdhsa
 CPU=fiji
 
